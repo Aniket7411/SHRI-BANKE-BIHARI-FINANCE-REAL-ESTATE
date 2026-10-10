@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+/* ───────────────────────── THEMES ─────────────────────────
+   Every colour on the site comes from these tokens.
+   Add a new theme by copying a block and changing values.   */
+
+:root,
+[data-theme="ivory"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --subtle: #f7f5f0;
+  --ink: #111827;
+  --ink-soft: #5b6270;
+  --line: #e9e5dc;
+  --accent: #a87a2c;
+  --accent-strong: #8c6320;
+  --accent-fg: #ffffff;
+  --accent-soft: #f6efe1;
+  --deep: #0f1b2d;
+  --deep-fg: #f5f1e8;
+  --deep-soft: #1a2940;
+  --chart-1: #2e5c9e;
+  --chart-2: #b07a1e;
+  --glass: rgba(255, 255, 255, 0.72);
+  --shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 12px 32px -12px rgba(17, 24, 39, 0.14);
+}
+
+[data-theme="emerald"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --subtle: #f2f7f4;
+  --ink: #0e1f1a;
+  --ink-soft: #536660;
+  --line: #dfe9e4;
+  --accent: #157a55;
+  --accent-strong: #0f5f42;
+  --accent-fg: #ffffff;
+  --accent-soft: #e5f3ec;
+  --deep: #0b2a21;
+  --deep-fg: #eef6f2;
+  --deep-soft: #123a2e;
+  --chart-1: #2e5c9e;
+  --chart-2: #b07a1e;
+  --glass: rgba(255, 255, 255, 0.72);
+  --shadow: 0 1px 2px rgba(14, 31, 26, 0.04), 0 12px 32px -12px rgba(14, 31, 26, 0.16);
+}
+
+[data-theme="midnight"] {
+  color-scheme: dark;
+  --bg: #0b1220;
+  --surface: #111a2b;
+  --subtle: #0f1727;
+  --ink: #eef1f6;
+  --ink-soft: #9aa5b8;
+  --line: #222e44;
+  --accent: #d4a85a;
+  --accent-strong: #e5bd74;
+  --accent-fg: #14100a;
+  --accent-soft: #2a2416;
+  --deep: #060b15;
+  --deep-fg: #eef1f6;
+  --deep-soft: #121c2e;
+  --chart-1: #5a86cc;
+  --chart-2: #b0812a;
+  --glass: rgba(11, 18, 32, 0.72);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -16px rgba(0, 0, 0, 0.6);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-subtle: var(--subtle);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-deep: var(--deep);
+  --color-deep-fg: var(--deep-fg);
+  --color-deep-soft: var(--deep-soft);
+  --color-wa: #25d366;
+
+  /* Global font families — set in lib/fonts.ts */
+  --font-display: var(--ff-display), ui-serif, Georgia, serif;
+  --font-sans: var(--ff-body), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: var(--shadow);
+  --ease-app: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-ping-slow: ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ───────────────────────── BASE ───────────────────────── */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    transition: background-color 0.4s var(--ease-app), color 0.4s var(--ease-app);
+  }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+  }
+  h1,
+  h2 {
+    font-weight: 700;
+  }
+  h3 {
+    font-weight: 600;
+  }
+  .font-display {
+    font-weight: 700;
+  }
+  /* Accent words inside headings: colour only, no italics */
+  h1 em,
+  h2 em,
+  blockquote em {
+    font-style: normal;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+  input[type="range"] {
+    accent-color: var(--accent);
+  }
+}
+
+/* ───────────────────────── UTILITIES ───────────────────────── */
+
+@utility container-app {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+@utility glass {
+  background: var(--glass);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Thin, elegant range slider */
+@utility range {
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--accent) var(--fill, 50%), var(--line) var(--fill, 50%));
+  cursor: pointer;
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s;
+  }
+  &::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+  }
+}
+
+/* Form field shared look */
+@utility field {
+  width: 100%;
+  border-radius: 0.875rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.8rem 1rem;
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  &::placeholder {
+    color: var(--ink-soft);
+    opacity: 0.7;
+  }
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
