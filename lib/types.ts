@@ -14,6 +14,7 @@ export interface Property {
   baths?: number;
   area: number; // sq.ft
   images: string[];
+  videos?: string[];
   tags: string[];
   featured?: boolean;
   verified?: boolean;
@@ -58,6 +59,24 @@ export type LeadInterest =
   | "Loan Against Property"
   | "Other";
 
+export interface Job {
+  id: string;
+  slug: string;
+  title: string;
+  department: string;
+  location: string;
+  employmentType: string;
+  experience: string;
+  salary: string;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+  postedAt: string; // ISO date
+}
+
+/** UTM / click-id parameters captured from the landing URL. */
+export type Utm = Partial<Record<"utm_source" | "utm_medium" | "utm_campaign" | "utm_term" | "utm_content" | "gclid" | "fbclid" | "landing", string>>;
+
 export interface Lead {
   name: string;
   phone: string;
@@ -68,4 +87,5 @@ export interface Lead {
   callbackSlot?: string;
   source: string; // which form / page produced the lead
   propertyId?: string;
+  utm?: Utm;
 }

@@ -6,15 +6,16 @@ import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 import { BadgeCheck, Car, House, MapPin, Search, Star } from "lucide-react";
 import { useRef, useState } from "react";
 import { IMG } from "@/lib/img";
-import { site } from "@/lib/site";
 import { calcEmi, formatINR, formatPrice } from "@/lib/format";
-import { localities } from "@/lib/data/properties";
 import { Button } from "@/components/ui/Button";
+import { useSite } from "@/components/layout/SiteProvider";
+import { site } from "@/lib/site";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const tabs = ["Buy", "Rent", "Loan"] as const;
 
-export function Hero() {
+export function Hero({ localities }: { localities: string[] }) {
+  const s = useSite();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
@@ -37,7 +38,7 @@ export function Hero() {
             <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent-fg uppercase">
               New
             </span>
-            Home loans now from {site.rates.home}% p.a.
+            Home loans now from {s.rates.home}% p.a.
           </motion.span>
 
           <h1 className="mt-6 text-[clamp(2.4rem,6vw,4.4rem)] leading-[1.04] text-ink">
@@ -70,7 +71,7 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.6 }}
           >
-            <SearchPanel />
+            <SearchPanel localities={localities} />
           </motion.div>
 
           <motion.div
@@ -121,10 +122,10 @@ export function Hero() {
           </motion.div>
 
           <motion.div style={{ y: cardY }} className="absolute top-8 -left-4 sm:-left-10">
-            <FloatCard delay={0.9} icon={<House className="size-5" strokeWidth={1.5} />} label="Home Loan" value={`${site.rates.home}%`} />
+            <FloatCard delay={0.9} icon={<House className="size-5" strokeWidth={1.5} />} label="Home Loan" value={`${s.rates.home}%`} />
           </motion.div>
           <motion.div style={{ y: cardY }} className="absolute top-1/2 -right-3 sm:-right-8">
-            <FloatCard delay={1.05} icon={<Car className="size-5" strokeWidth={1.5} />} label="Vehicle Loan" value={`${site.rates.vehicle}%`} />
+            <FloatCard delay={1.05} icon={<Car className="size-5" strokeWidth={1.5} />} label="Vehicle Loan" value={`${s.rates.vehicle}%`} />
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -163,13 +164,14 @@ function FloatCard({ icon, label, value, delay }: { icon: React.ReactNode; label
   );
 }
 
-function SearchPanel() {
+function SearchPanel({ localities }: { localities: string[] }) {
+  const s = useSite();
   const router = useRouter();
   const [tab, setTab] = useState<(typeof tabs)[number]>("Buy");
   const [locality, setLocality] = useState("");
   const [type, setType] = useState("");
   const [amount, setAmount] = useState(3000000);
-  const emi = calcEmi(amount, site.rates.home, 20).emi;
+  const emi = calcEmi(amount, s.rates.home, 20).emi;
 
   const search = () => {
     const q = new URLSearchParams({ purpose: tab });
@@ -252,7 +254,7 @@ function SearchPanel() {
                 style={{ "--fill": `${((amount - 500000) / 19500000) * 100}%` } as React.CSSProperties}
               />
               <span className="mt-2 block text-xs text-ink-soft">
-                EMI ≈ <strong className="text-ink">{formatINR(emi)}/mo</strong> · 20 yrs @ {site.rates.home}%
+                EMI ≈ <strong className="text-ink">{formatINR(emi)}/mo</strong> · 20 yrs @ {s.rates.home}%
               </span>
             </label>
             <Button onClick={() => router.push("/loans#eligibility")} size="lg" arrow className="rounded-2xl">

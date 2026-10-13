@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ArrowUpRight, Clock, Mail, MapPin, Phone } from "lucide-react";
-import { getFaqs } from "@/lib/api";
+import { getFaqs, getSiteSettings } from "@/lib/api";
 import { IMG } from "@/lib/img";
 import { site, telLink, whatsappLink } from "@/lib/site";
 import { PageHero } from "@/components/ui/PageHero";
@@ -15,15 +15,14 @@ export const metadata: Metadata = {
   description: `Talk to ${site.fullName} — call, WhatsApp or visit our office in Kanpur. Free property and loan consultation.`,
 };
 
-const channels = [
-  { icon: <WhatsAppIcon className="size-5" />, label: "WhatsApp", value: "Chat instantly", href: whatsappLink(), tint: "text-wa", external: true },
-  { icon: <Phone className="size-5" strokeWidth={1.5} />, label: "Call us", value: site.phone, href: telLink, tint: "text-accent" },
-  { icon: <Mail className="size-5" strokeWidth={1.5} />, label: "Email", value: site.email, href: `mailto:${site.email}`, tint: "text-accent" },
-  { icon: <InstagramIcon className="size-5" />, label: "Instagram", value: site.instagramHandle, href: site.instagram, tint: "text-accent", external: true },
-];
-
 export default async function ContactPage() {
-  const faqs = await getFaqs();
+  const [faqs, s] = await Promise.all([getFaqs(), getSiteSettings()]);
+  const channels = [
+  { icon: <WhatsAppIcon className="size-5" />, label: "WhatsApp", value: "Chat instantly", href: whatsappLink(s), tint: "text-wa", external: true },
+  { icon: <Phone className="size-5" strokeWidth={1.5} />, label: "Call us", value: s.phone, href: telLink(s), tint: "text-accent" },
+  { icon: <Mail className="size-5" strokeWidth={1.5} />, label: "Email", value: s.email, href: `mailto:${s.email}`, tint: "text-accent" },
+  { icon: <InstagramIcon className="size-5" />, label: "Instagram", value: s.instagramHandle, href: s.instagram, tint: "text-accent", external: true },
+  ];
 
   return (
     <>
@@ -73,17 +72,17 @@ export default async function ContactPage() {
           <Reveal className="space-y-4 text-sm">
             <p className="flex gap-3 text-ink">
               <MapPin className="mt-0.5 size-5 shrink-0 text-accent" strokeWidth={1.5} />
-              {site.address}
+              {s.address}
             </p>
             <p className="flex gap-3 text-ink">
               <Clock className="mt-0.5 size-5 shrink-0 text-accent" strokeWidth={1.5} />
-              {site.hours} · Sunday by appointment
+              {s.hours} · Sunday by appointment
             </p>
           </Reveal>
           <Reveal className="overflow-hidden rounded-[28px] border border-line">
             <iframe
               title="Office location on Google Maps"
-              src={`https://www.google.com/maps?q=${encodeURIComponent(site.address)}&output=embed`}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(s.address)}&output=embed`}
               className="h-72 w-full grayscale-[0.4] sm:h-96"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"

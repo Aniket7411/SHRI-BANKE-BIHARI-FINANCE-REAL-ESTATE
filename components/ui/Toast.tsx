@@ -1,10 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { CircleCheck } from "lucide-react";
+import { CircleAlert, CircleCheck } from "lucide-react";
 import { createContext, useCallback, useContext, useState } from "react";
 
-type Toast = { id: number; title: string; text?: string };
+type Toast = { id: number; title: string; text?: string; tone?: "success" | "error" };
 const Ctx = createContext<(t: Omit<Toast, "id">) => void>(() => {});
 
 export const useToast = () => useContext(Ctx);
@@ -36,7 +36,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               transition={{ type: "spring", stiffness: 420, damping: 32 }}
               className="glass pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border border-line p-4 shadow-soft"
             >
-              <CircleCheck className="mt-0.5 size-5 shrink-0 text-accent" strokeWidth={1.75} />
+              {t.tone === "error" ? (
+                <CircleAlert className="mt-0.5 size-5 shrink-0 text-red-600" strokeWidth={1.75} />
+              ) : (
+                <CircleCheck className="mt-0.5 size-5 shrink-0 text-accent" strokeWidth={1.75} />
+              )}
               <div>
                 <p className="text-sm font-semibold text-ink">{t.title}</p>
                 {t.text && <p className="mt-0.5 text-[13px] text-ink-soft">{t.text}</p>}

@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Check, Clock, FileCheck2, Handshake, Landmark, Phone, ShieldCheck, Building2 } from "lucide-react";
 import { IMG } from "@/lib/img";
-import { site, telLink, whatsappLink } from "@/lib/site";
-import { marquee, services, stats, steps } from "@/lib/data/content";
+import { telLink, whatsappLink } from "@/lib/site";
+import { marquee, services, steps } from "@/lib/data/content";
+import { getSiteSettings } from "@/lib/api";
 import { Counter } from "@/components/ui/Counter";
 import { Reveal, RevealItem, Stagger } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -28,7 +29,8 @@ export function Marquee() {
 }
 
 /* ───────── Stats ───────── */
-export function Stats() {
+export async function Stats() {
+  const { stats } = await getSiteSettings();
   return (
     <section className="container-app py-16 sm:py-20">
       <Stagger className="grid grid-cols-2 gap-px overflow-hidden rounded-[28px] border border-line bg-line lg:grid-cols-4">
@@ -220,14 +222,15 @@ export function WhyUs() {
 }
 
 /* ───────── Instagram ───────── */
-export function InstagramStrip() {
+export async function InstagramStrip() {
+  const s = await getSiteSettings();
   const shots = [IMG.house2, IMG.interior4, IMG.keys, IMG.villa, IMG.livingRoom, IMG.car2];
   return (
     <section className="container-app py-20 sm:py-24">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-        <SectionHeading eyebrow="Follow along" title={<>Fresh listings daily on Instagram.</>} text={`Join 1,500+ followers at ${site.instagramHandle} for new properties, rate updates and tips.`} />
+        <SectionHeading eyebrow="Follow along" title={<>Fresh listings daily on Instagram.</>} text={`Join 1,500+ followers at ${s.instagramHandle} for new properties, rate updates and tips.`} />
         <Reveal>
-          <ButtonA href={site.instagram} target="_blank" rel="noreferrer" variant="outline" arrow icon={<InstagramIcon className="size-4" />}>
+          <ButtonA href={s.instagram} target="_blank" rel="noreferrer" variant="outline" arrow icon={<InstagramIcon className="size-4" />}>
             Follow us
           </ButtonA>
         </Reveal>
@@ -236,7 +239,7 @@ export function InstagramStrip() {
         {shots.map((src, i) => (
           <RevealItem key={src}>
             <a
-              href={site.instagram}
+              href={s.instagram}
               target="_blank"
               rel="noreferrer"
               aria-label={`Instagram post ${i + 1}`}
@@ -255,7 +258,8 @@ export function InstagramStrip() {
 }
 
 /* ───────── Final CTA ───────── */
-export function CtaBand() {
+export async function CtaBand() {
+  const s = await getSiteSettings();
   return (
     <section className="container-app pb-20 sm:pb-28">
       <Reveal className="relative overflow-hidden rounded-[32px] bg-deep px-6 py-14 text-deep-fg sm:px-12 sm:py-20">
@@ -270,11 +274,11 @@ export function CtaBand() {
             Get a free property shortlist or loan eligibility report within 24 hours. No obligations.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonA href={whatsappLink()} target="_blank" rel="noreferrer" size="lg" className="bg-wa text-white hover:bg-wa/90" icon={<WhatsAppIcon className="size-5" />}>
+            <ButtonA href={whatsappLink(s)} target="_blank" rel="noreferrer" size="lg" className="bg-wa text-white hover:bg-wa/90" icon={<WhatsAppIcon className="size-5" />}>
               WhatsApp us
             </ButtonA>
-            <ButtonA href={telLink} variant="light" size="lg" icon={<Phone className="size-4" strokeWidth={1.5} />}>
-              {site.phone}
+            <ButtonA href={telLink(s)} variant="light" size="lg" icon={<Phone className="size-4" strokeWidth={1.5} />}>
+              {s.phone}
             </ButtonA>
           </div>
         </div>

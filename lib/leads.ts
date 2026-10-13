@@ -1,23 +1,23 @@
 import type { Lead } from "@/lib/types";
-
-const KEY = "sbb:leads";
+import { getUtm } from "@/lib/utm";
 
 /**
- * Submit a lead (enquiry / callback / loan application).
- * For now it's stored in the browser so the demo works end-to-end.
- * TODO (CRM): replace with `fetch("/api/leads", { method: "POST", body: JSON.stringify(lead) })`.
+ * Submit a lead (enquiry / callback / loan application) to the CRM.
+ * The server stores it in Supabase, merges repeat enquiries and emails the team.
  */
-export async function submitLead(lead: Lead): Promise<{ ok: true; id: string }> {
-  const id = `L-${Date.now().toString(36).toUpperCase()}`;
+export async function submitLead(lead: Lead & { website?: string }): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   try {
-    const all = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    all.push({ ...lead, id, createdAt: new Date().toISOString() });
-    localStorage.setItem(KEY, JSON.stringify(all));
+    const res = await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...lead, utm: lead.utm ?? getUtm() }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) return { ok: false, error: data.error ?? "Something went wrong. Please try again." };
+    return { ok: true, id: data.id };
   } catch {
-    /* storage unavailable — ignore in demo */
+    return { ok: false, error: "Network error. Please check your connection and try again." };
   }
-  await new Promise((r) => setTimeout(r, 700));
-  return { ok: true, id };
 }
 
 /** Indian mobile: 10 digits starting 6-9, optional +91 / 0 prefix. */

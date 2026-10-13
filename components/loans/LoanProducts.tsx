@@ -8,10 +8,12 @@ import type { LoanProduct } from "@/lib/types";
 import { whatsappLink } from "@/lib/site";
 import { ButtonA, ButtonLink } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/ui/BrandIcons";
+import { useSite } from "@/components/layout/SiteProvider";
 
 const icons = { home: House, car: Car, building: Building2, briefcase: Briefcase, wallet: Wallet, repeat: Repeat };
 
 export function LoanProducts({ items }: { items: LoanProduct[] }) {
+  const s = useSite();
   const [active, setActive] = useState(items[0].id);
   const p = items.find((x) => x.id === active)!;
 
@@ -96,7 +98,7 @@ export function LoanProducts({ items }: { items: LoanProduct[] }) {
                 Apply for {p.name}
               </ButtonLink>
               <ButtonA
-                href={whatsappLink(`Hi! I'd like details on a ${p.name}.`)}
+                href={whatsappLink(s, `Hi! I'd like details on a ${p.name}.`)}
                 target="_blank"
                 rel="noreferrer"
                 variant="outline"

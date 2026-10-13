@@ -6,16 +6,23 @@ import { ArrowUpRight, Car, House, Building2 } from "lucide-react";
 import { useState } from "react";
 import { calcEmi, formatINR, formatPrice } from "@/lib/format";
 import { Reveal } from "@/components/ui/Reveal";
+import type { LoanProduct } from "@/lib/types";
 
-const rates = [
-  { id: "home", icon: House, name: "Home Loan", rate: 7.15, tenure: 20, amount: 5000000 },
-  { id: "vehicle", icon: Car, name: "Vehicle Loan", rate: 7.55, tenure: 5, amount: 1000000 },
-  { id: "lap", icon: Building2, name: "Loan Against Property", rate: 8.75, tenure: 10, amount: 3000000 },
+/** Example loan used for the EMI preview of each product (rates come from Admin → Loans). */
+const presets = [
+  { id: "home", icon: House, tenure: 20, amount: 5000000 },
+  { id: "vehicle", icon: Car, tenure: 5, amount: 1000000 },
+  { id: "lap", icon: Building2, tenure: 10, amount: 3000000 },
 ];
 
 /** Dark, interactive rates band: pick a product, see an instant EMI. */
-export function RatesBand() {
+export function RatesBand({ loans }: { loans: LoanProduct[] }) {
+  const rates = presets.flatMap((p) => {
+    const l = loans.find((x) => x.id === p.id);
+    return l ? [{ ...p, name: l.name, rate: l.rate }] : [];
+  });
   const [active, setActive] = useState(0);
+  if (!rates.length) return null;
   const r = rates[active];
   const emi = calcEmi(r.amount, r.rate, r.tenure).emi;
 

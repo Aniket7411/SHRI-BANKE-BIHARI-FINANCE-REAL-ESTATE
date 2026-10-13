@@ -60,7 +60,11 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
                 “{t.quote}”
               </blockquote>
               <figcaption className="mt-8 flex items-center justify-center gap-3">
-                <Image src={t.avatar} alt="" width={48} height={48} className="size-12 rounded-full object-cover" />
+                {t.avatar ? (
+                  <Image src={t.avatar} alt="" width={48} height={48} className="size-12 rounded-full object-cover" />
+                ) : (
+                  <span className="grid size-12 place-items-center rounded-full bg-accent-soft font-display text-lg text-accent-strong">{t.name.slice(0, 1)}</span>
+                )}
                 <div className="text-left">
                   <p className="text-sm font-semibold text-ink">{t.name}</p>
                   <p className="text-xs text-ink-soft">{t.role}</p>

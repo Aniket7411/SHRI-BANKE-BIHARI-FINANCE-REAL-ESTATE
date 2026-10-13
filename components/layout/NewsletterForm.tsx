@@ -10,9 +10,18 @@ export function NewsletterForm() {
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
         if (!email) return;
+        const res = await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }).catch(() => null);
+        if (!res?.ok) {
+          toast({ title: "Couldn't subscribe", text: "Please check the email address and try again." });
+          return;
+        }
         setEmail("");
         toast({ title: "You're subscribed", text: "We'll share rate drops and new listings." });
       }}

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { getProperties } from "@/lib/api";
-import { localities } from "@/lib/data/properties";
+import { getLocalities, getProperties } from "@/lib/api";
 import { IMG } from "@/lib/img";
 import { PageHero } from "@/components/ui/PageHero";
 import { PropertyExplorer } from "@/components/property/PropertyExplorer";
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PropertiesPage() {
-  const items = await getProperties();
+  const [items, localities] = await Promise.all([getProperties(), getLocalities()]);
   return (
     <>
       <PageHero

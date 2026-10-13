@@ -9,6 +9,7 @@ import { nav, site, telLink } from "@/lib/site";
 import { LogoMark } from "@/components/ui/BrandIcons";
 import { ButtonLink } from "@/components/ui/Button";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { useSite } from "@/components/layout/SiteProvider";
 
 export function Logo() {
   return (
@@ -29,6 +30,7 @@ export function isActive(pathname: string, href: string) {
 }
 
 export function Header() {
+  const s = useSite();
   const pathname = usePathname();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
@@ -73,7 +75,7 @@ export function Header() {
           <div className="flex items-center gap-2">
             <ThemeSwitcher />
             <a
-              href={telLink}
+              href={telLink(s)}
               aria-label="Call us"
               className="grid size-10 place-items-center rounded-full border border-line text-ink transition hover:border-accent hover:text-accent lg:hidden"
             >

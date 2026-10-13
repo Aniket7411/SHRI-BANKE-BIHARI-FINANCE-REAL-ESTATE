@@ -9,6 +9,7 @@ import type { Lead, LeadInterest } from "@/lib/types";
 import { Button, ButtonA } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/ui/BrandIcons";
 import { useToast } from "@/components/ui/Toast";
+import { useSite } from "@/components/layout/SiteProvider";
 
 const interests: LeadInterest[] = [
   "Buy Property",
@@ -21,8 +22,8 @@ const interests: LeadInterest[] = [
 ];
 
 /**
- * Reusable lead-capture form. Every submission goes through `submitLead`,
- * which is the single hook-point for the future CRM.
+ * Reusable lead-capture form. Every submission goes through `submitLead`
+ * → `/api/leads` → Supabase CRM + email alerts.
  */
 export function LeadForm({
   source,
@@ -39,9 +40,11 @@ export function LeadForm({
   extra?: { callbackSlot?: string };
   submitLabel?: string;
 }) {
+  const s = useSite();
   const toast = useToast();
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [ref, setRef] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,7 +67,13 @@ export function LeadForm({
     if (Object.keys(errs).length) return;
 
     setStatus("sending");
-    await submitLead(lead);
+    const res = await submitLead({ ...lead, website: String(fd.get("website") ?? "") });
+    if (!res.ok) {
+      setStatus("idle");
+      toast({ title: "Couldn't send your request", text: res.error });
+      return;
+    }
+    setRef(res.id);
     setStatus("done");
     toast({ title: "Request received", text: "Our advisor will call you shortly." });
   }
@@ -90,8 +99,9 @@ export function LeadForm({
           <p className="mt-2 max-w-xs text-sm text-ink-soft">
             We&apos;ve received your request. An advisor will reach out within working hours.
           </p>
+          {ref && <p className="mt-2 text-xs text-ink-soft">Reference: <strong className="text-ink">{ref}</strong></p>}
           <div className="mt-6 flex flex-wrap justify-center gap-2">
-            <ButtonA href={whatsappLink("Hi! I just submitted an enquiry on your website.")} target="_blank" rel="noreferrer" variant="outline" size="sm" icon={<WhatsAppIcon className="size-4 text-wa" />}>
+            <ButtonA href={whatsappLink(s, `Hi! I just submitted an enquiry on your website${ref ? ` (ref ${ref})` : ""}.`)} target="_blank" rel="noreferrer" variant="outline" size="sm" icon={<WhatsAppIcon className="size-4 text-wa" />}>
               Chat now
             </ButtonA>
             <Button variant="ghost" size="sm" onClick={() => setStatus("idle")}>
@@ -109,6 +119,8 @@ export function LeadForm({
           noValidate
           className="grid gap-4 sm:grid-cols-2"
         >
+          {/* Honeypot for bots — hidden from people and screen readers */}
+          <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] size-px opacity-0" />
           <Field label="Full name" error={errors.name}>
             <input name="name" autoComplete="name" placeholder="Your name" className="field" />
           </Field>

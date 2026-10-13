@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BadgeCheck, Bath, BedDouble, Check, ChevronRight, MapPin, Phone, Ruler, Tag } from "lucide-react";
-import { getProperties, getPropertyById, getSimilarProperties } from "@/lib/api";
+import { getProperties, getPropertyById, getSimilarProperties, getSiteSettings } from "@/lib/api";
 import { calcEmi, formatINR, formatPrice } from "@/lib/format";
-import { site, telLink, whatsappLink } from "@/lib/site";
+import { videoEmbed } from "@/lib/video";
+import { telLink, whatsappLink } from "@/lib/site";
 import { Gallery } from "@/components/property/Gallery";
 import { ShareSave } from "@/components/property/ShareSave";
 import { PropertyCard } from "@/components/property/PropertyCard";
@@ -15,7 +16,8 @@ import { Reveal } from "@/components/ui/Reveal";
 
 export async function generateStaticParams() {
   const all = await getProperties();
-  return all.map((p) => ({ id: p.id }));
+  // Cache Components needs at least one param; unknown ids still render on demand.
+  return all.length ? all.map((p) => ({ id: p.id })) : [{ id: "_" }];
 }
 
 export async function generateMetadata({ params }: PageProps<"/properties/[id]">): Promise<Metadata> {
@@ -33,9 +35,9 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[i
   const { id } = await params;
   const p = await getPropertyById(id);
   if (!p) notFound();
-  const similar = await getSimilarProperties(id);
+  const [similar, s] = await Promise.all([getSimilarProperties(id), getSiteSettings()]);
   const loan = p.price * 0.8;
-  const emi = p.purpose === "Buy" ? calcEmi(loan, site.rates.home, 20).emi : 0;
+  const emi = p.purpose === "Buy" ? calcEmi(loan, s.rates.home, 20).emi : 0;
 
   const specs = [
     p.beds && { icon: BedDouble, label: "Bedrooms", value: p.beds },
@@ -96,6 +98,30 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[i
             ))}
           </div>
 
+          {!!p.videos?.length && (
+            <section className="mt-10">
+              <h2 className="text-2xl text-ink">Video tour</h2>
+              <div className="mt-4 grid gap-4">
+                {p.videos.map((v) => {
+                  const embed = videoEmbed(v);
+                  return embed ? (
+                    <iframe
+                      key={v}
+                      src={embed}
+                      title={`${p.title} video tour`}
+                      loading="lazy"
+                      allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="aspect-video w-full rounded-2xl border border-line"
+                    />
+                  ) : (
+                    <video key={v} src={v} controls preload="metadata" playsInline className="aspect-video w-full rounded-2xl border border-line bg-black" />
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
           <section className="mt-10">
             <h2 className="text-2xl text-ink">About this property</h2>
             <p className="mt-3 leading-relaxed text-ink-soft">{p.description}</p>
@@ -125,7 +151,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[i
                     <span className="font-sans text-base font-normal text-deep-fg/60"> /month</span>
                   </p>
                   <p className="mt-1 text-sm text-deep-fg/60">
-                    Estimated EMI on {formatPrice(loan)} loan (80%) · {site.rates.home}% · 20 yrs
+                    Estimated EMI on {formatPrice(loan)} loan (80%) · {s.rates.home}% · 20 yrs
                   </p>
                 </div>
                 <Link href="/loans#emi" className="text-sm font-semibold text-accent hover:underline">
@@ -146,7 +172,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[i
             </p>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <ButtonA
-                href={whatsappLink(`Hi! I'm interested in "${p.title}" (${p.locality}) at ${formatPrice(p.price)}.`)}
+                href={whatsappLink(s, `Hi! I'm interested in "${p.title}" (${p.locality}) at ${formatPrice(p.price)}.`)}
                 target="_blank"
                 rel="noreferrer"
                 className="bg-wa text-white hover:bg-wa/90"
@@ -154,7 +180,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[i
               >
                 WhatsApp
               </ButtonA>
-              <ButtonA href={telLink} variant="outline" icon={<Phone className="size-4" strokeWidth={1.5} />}>
+              <ButtonA href={telLink(s)} variant="outline" icon={<Phone className="size-4" strokeWidth={1.5} />}>
                 Call
               </ButtonA>
             </div>

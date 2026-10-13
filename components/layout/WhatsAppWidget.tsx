@@ -5,6 +5,7 @@ import { Send, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { site, whatsappLink } from "@/lib/site";
 import { WhatsAppIcon, LogoMark } from "@/components/ui/BrandIcons";
+import { useSite } from "@/components/layout/SiteProvider";
 
 const quickReplies = [
   "I want a Home Loan",
@@ -15,6 +16,7 @@ const quickReplies = [
 
 /** Floating WhatsApp chat — opens a chat-style card, then hands off to WhatsApp. */
 export function WhatsAppWidget() {
+  const s = useSite();
   const [open, setOpen] = useState(false);
   const [typing, setTyping] = useState(true);
   const [text, setText] = useState("");
@@ -34,7 +36,7 @@ export function WhatsAppWidget() {
   }, [open]);
 
   const send = (msg: string) => {
-    window.open(whatsappLink(msg || "Hi! I'd like to know more about your services."), "_blank", "noopener");
+    window.open(whatsappLink(s, msg || "Hi! I'd like to know more about your services."), "_blank", "noopener");
     setText("");
   };
 

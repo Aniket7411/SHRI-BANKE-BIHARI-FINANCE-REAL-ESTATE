@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { getFaqs, getLoanProducts } from "@/lib/api";
+import { getFaqs, getLoanProducts, getSiteSettings } from "@/lib/api";
 import { IMG } from "@/lib/img";
-import { site } from "@/lib/site";
 import { PageHero } from "@/components/ui/PageHero";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
@@ -12,13 +11,16 @@ import { EligibilityChecker } from "@/components/loans/EligibilityChecker";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { Process } from "@/components/home/Sections";
 
-export const metadata: Metadata = {
-  title: "Home & Vehicle Loans",
-  description: `Home loans from ${site.rates.home}% and vehicle loans from ${site.rates.vehicle}% in Kanpur. EMI calculator, eligibility check and doorstep documentation.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const s = await getSiteSettings();
+  return {
+    title: "Home & Vehicle Loans",
+    description: `Home loans from ${s.rates.home}% and vehicle loans from ${s.rates.vehicle}% in Kanpur. EMI calculator, eligibility check and doorstep documentation.`,
+  };
+}
 
 export default async function LoansPage() {
-  const [products, faqs] = await Promise.all([getLoanProducts(), getFaqs()]);
+  const [products, faqs, s] = await Promise.all([getLoanProducts(), getFaqs(), getSiteSettings()]);
 
   return (
     <>
@@ -35,8 +37,8 @@ export default async function LoansPage() {
       >
         <div className="mt-8 flex flex-wrap gap-3">
           {[
-            ["Home Loan", site.rates.home],
-            ["Vehicle Loan", site.rates.vehicle],
+            ["Home Loan", s.rates.home],
+            ["Vehicle Loan", s.rates.vehicle],
           ].map(([k, v]) => (
             <div key={k} className="glass rounded-2xl border border-white/10 px-5 py-3 !bg-white/10">
               <p className="text-xs text-deep-fg/70">{k} from</p>

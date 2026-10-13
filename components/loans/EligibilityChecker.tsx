@@ -3,13 +3,14 @@
 import { motion } from "motion/react";
 import { useState } from "react";
 import { formatINR, formatPrice, principalFromEmi } from "@/lib/format";
-import { site } from "@/lib/site";
 import { ButtonLink } from "@/components/ui/Button";
+import { useSite } from "@/components/layout/SiteProvider";
 
 const FOIR = 0.5; // lenders typically allow ~50% of net income towards EMIs
 
 /** Quick home-loan eligibility estimate from income and existing EMIs. */
 export function EligibilityChecker() {
+  const s = useSite();
   const [income, setIncome] = useState(75000);
   const [existing, setExisting] = useState(5000);
   const [years, setYears] = useState(20);
@@ -18,7 +19,7 @@ export function EligibilityChecker() {
   const maxTenure = Math.max(1, Math.min(30, 60 - age));
   const tenure = Math.min(years, maxTenure);
   const emiCap = Math.max(0, income * FOIR - existing);
-  const eligible = principalFromEmi(emiCap, site.rates.home, tenure);
+  const eligible = principalFromEmi(emiCap, s.rates.home, tenure);
   const pct = Math.min(100, (eligible / 20000000) * 100);
 
   return (
@@ -55,7 +56,7 @@ export function EligibilityChecker() {
             <div>
               <dt className="text-deep-fg/60">At rate / tenure</dt>
               <dd className="mt-0.5 font-semibold">
-                {site.rates.home}% · {tenure} yrs
+                {s.rates.home}% · {tenure} yrs
               </dd>
             </div>
           </dl>

@@ -1,7 +1,9 @@
 import { ButtonLink } from "@/components/ui/Button";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 
 export default function NotFound() {
   return (
+    <SiteChrome>
     <section className="container-app grid min-h-[70dvh] place-items-center pt-24 pb-16 text-center">
       <div>
         <p className="eyebrow">Error 404</p>
@@ -19,5 +21,6 @@ export default function NotFound() {
         </div>
       </div>
     </section>
+    </SiteChrome>
   );
 }

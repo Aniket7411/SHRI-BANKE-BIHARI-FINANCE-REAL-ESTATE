@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import { nav, site, telLink, whatsappLink } from "@/lib/site";
-import { InstagramIcon, LogoMark, WhatsAppIcon } from "@/components/ui/BrandIcons";
+import { nav, site, telLink, whatsappLink, type SiteSettings } from "@/lib/site";
+import { FacebookIcon, InstagramIcon, LogoMark, WhatsAppIcon, YouTubeIcon } from "@/components/ui/BrandIcons";
 import { NewsletterForm } from "./NewsletterForm";
 
 const services = [
@@ -13,7 +13,7 @@ const services = [
   { label: "Sell Property", href: "/contact" },
 ];
 
-export function Footer() {
+export function Footer({ settings: s }: { settings: SiteSettings }) {
   return (
     <footer className="relative overflow-hidden bg-deep text-deep-fg">
       <div
@@ -36,7 +36,7 @@ export function Footer() {
             </p>
             <div className="mt-6 flex gap-2">
               <a
-                href={site.instagram}
+                href={s.instagram}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
@@ -44,8 +44,30 @@ export function Footer() {
               >
                 <InstagramIcon className="size-[18px]" />
               </a>
+              {s.facebook && (
+                <a
+                  href={s.facebook}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Facebook"
+                  className="grid size-10 place-items-center rounded-full border border-white/15 transition hover:border-accent hover:text-accent"
+                >
+                  <FacebookIcon className="size-[18px]" />
+                </a>
+              )}
+              {s.youtube && (
+                <a
+                  href={s.youtube}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="YouTube"
+                  className="grid size-10 place-items-center rounded-full border border-white/15 transition hover:border-accent hover:text-accent"
+                >
+                  <YouTubeIcon className="size-[18px]" />
+                </a>
+              )}
               <a
-                href={whatsappLink()}
+                href={whatsappLink(s)}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="WhatsApp"
@@ -63,6 +85,7 @@ export function Footer() {
                   {n.label}
                 </FooterLink>
               ))}
+              <FooterLink href="/careers">Careers</FooterLink>
             </FooterCol>
             <FooterCol title="Services">
               {services.map((s) => (
@@ -75,23 +98,23 @@ export function Footer() {
               <FooterCol title="Reach us">
                 <li className="flex gap-2.5 text-sm text-deep-fg/70">
                   <MapPin className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.5} />
-                  {site.address}
+                  {s.address}
                 </li>
                 <li>
-                  <a href={telLink} className="flex gap-2.5 text-sm text-deep-fg/70 hover:text-deep-fg">
+                  <a href={telLink(s)} className="flex gap-2.5 text-sm text-deep-fg/70 hover:text-deep-fg">
                     <Phone className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.5} />
-                    {site.phone}
+                    {s.phone}
                   </a>
                 </li>
                 <li>
-                  <a href={`mailto:${site.email}`} className="flex gap-2.5 text-sm break-all text-deep-fg/70 hover:text-deep-fg">
+                  <a href={`mailto:${s.email}`} className="flex gap-2.5 text-sm break-all text-deep-fg/70 hover:text-deep-fg">
                     <Mail className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.5} />
-                    {site.email}
+                    {s.email}
                   </a>
                 </li>
                 <li className="flex gap-2.5 text-sm text-deep-fg/70">
                   <Clock className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.5} />
-                  {site.hours}
+                  {s.hours}
                 </li>
               </FooterCol>
             </div>

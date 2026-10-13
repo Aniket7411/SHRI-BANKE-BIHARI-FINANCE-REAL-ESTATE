@@ -1,14 +1,6 @@
 import { IMG } from "@/lib/img";
 import type { Faq, Testimonial } from "@/lib/types";
 
-/** Headline numbers — TODO: confirm with the client before launch. */
-export const stats = [
-  { value: 1500, suffix: "+", label: "Families on Instagram" },
-  { value: 7.15, suffix: "%", label: "Home loans from", decimals: 2 },
-  { value: 20, suffix: "+", label: "Partner banks & NBFCs" },
-  { value: 48, suffix: " hr", label: "Typical loan approval" },
-];
-
 export const steps = [
   { title: "Tell us your goal", text: "Share what you want — a home, a car, a buyer, or funds. One quick call or WhatsApp." },
   { title: "Get matched", text: "We shortlist verified properties and compare offers from 20+ lenders for you." },
