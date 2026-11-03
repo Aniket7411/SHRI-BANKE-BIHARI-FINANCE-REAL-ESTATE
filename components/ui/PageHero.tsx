@@ -23,7 +23,7 @@ export function PageHero({
       <div className="relative overflow-hidden rounded-[32px] bg-deep text-deep-fg">
         <Image src={image} alt="" fill preload sizes="100vw" className="object-cover opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-r from-deep via-deep/80 to-deep/20" />
-        <div className="relative px-6 py-14 sm:px-12 sm:py-20">
+        <div className="relative px-6 py-12 sm:px-12 sm:py-14">
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-deep-fg/60">
             <Link href="/" className="hover:text-deep-fg">
               Home

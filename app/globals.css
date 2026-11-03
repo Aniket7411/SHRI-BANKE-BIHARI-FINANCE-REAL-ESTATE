@@ -10,8 +10,8 @@
   --bg: #ffffff;
   --surface: #ffffff;
   --subtle: #f7f5f0;
-  --ink: #111827;
-  --ink-soft: #5b6270;
+  --ink: #0b1220;
+  --ink-soft: #434a57;
   --line: #e9e5dc;
   --accent: #a87a2c;
   --accent-strong: #8c6320;
@@ -31,8 +31,8 @@
   --bg: #ffffff;
   --surface: #ffffff;
   --subtle: #f2f7f4;
-  --ink: #0e1f1a;
-  --ink-soft: #536660;
+  --ink: #08150f;
+  --ink-soft: #3d4f49;
   --line: #dfe9e4;
   --accent: #157a55;
   --accent-strong: #0f5f42;
@@ -53,7 +53,7 @@
   --surface: #111a2b;
   --subtle: #0f1727;
   --ink: #eef1f6;
-  --ink-soft: #9aa5b8;
+  --ink-soft: #b4bdcc;
   --line: #222e44;
   --accent: #d4a85a;
   --accent-strong: #e5bd74;
@@ -156,7 +156,7 @@
 
 @utility container-app {
   width: 100%;
-  max-width: 80rem;
+  max-width: 90rem;
   margin-inline: auto;
   padding-inline: 1rem;
   @media (width >= 40rem) {

@@ -16,7 +16,8 @@ export async function updateProfile(fd: FormData): Promise<ActionResult> {
 }
 
 export async function changePassword(fd: FormData): Promise<ActionResult> {
-  const { db } = await requireStaff();
+  const { db, staff } = await requireStaff();
+  if (staff.role !== "admin") return fail("Your password is managed by your admin. Ask them for a new one.");
   const password = String(fd.get("password") ?? "");
   if (password.length < 8) return fail("Use at least 8 characters", { password: "Use at least 8 characters" });
   if (password !== String(fd.get("confirm") ?? "")) return fail("Passwords don't match", { confirm: "Passwords don't match" });

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import { nav, site, telLink, whatsappLink, type SiteSettings } from "@/lib/site";
+import { nav, site, telLink, telHref, whatsappLink, type SiteSettings } from "@/lib/site";
 import { FacebookIcon, InstagramIcon, LogoMark, WhatsAppIcon, YouTubeIcon } from "@/components/ui/BrandIcons";
 import { NewsletterForm } from "./NewsletterForm";
 
@@ -23,16 +23,15 @@ export function Footer({ settings: s }: { settings: SiteSettings }) {
       <div className="container-app relative pt-16 pb-28 md:pb-10">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-3">
-              <LogoMark className="size-11 [&_rect]:fill-white/10" />
+            <div className="flex items-center gap-4">
+              <LogoMark className="size-20" />
               <div>
                 <p className="font-display text-xl">{site.name}</p>
                 <p className="text-[10px] tracking-[0.22em] text-deep-fg/60 uppercase">Finance &amp; Real Estate</p>
               </div>
             </div>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-deep-fg/70">
-              {site.tagline}. Buy, sell or rent with confidence, and finance it at the best available rates — all under one
-              roof.
+              {site.about}
             </p>
             <div className="mt-6 flex gap-2">
               <a
@@ -106,6 +105,14 @@ export function Footer({ settings: s }: { settings: SiteSettings }) {
                     {s.phone}
                   </a>
                 </li>
+                {s.phone2 && (
+                  <li>
+                    <a href={telHref(s.phone2)} className="flex gap-2.5 text-sm text-deep-fg/70 hover:text-deep-fg">
+                      <Phone className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.5} />
+                      {s.phone2}
+                    </a>
+                  </li>
+                )}
                 <li>
                   <a href={`mailto:${s.email}`} className="flex gap-2.5 text-sm break-all text-deep-fg/70 hover:text-deep-fg">
                     <Mail className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.5} />
@@ -130,11 +137,43 @@ export function Footer({ settings: s }: { settings: SiteSettings }) {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-deep-fg/50 md:flex-row md:justify-between">
-          <p>© {2026} {site.fullName}. All rights reserved.</p>
+          <p>
+            © {2026} {site.fullName}. All rights reserved.
+            <span className="mx-2 opacity-40">·</span>
+            <Link href="/privacy" className="underline-offset-4 hover:text-deep-fg hover:underline">
+              Privacy
+            </Link>
+            <span className="mx-2 opacity-40">·</span>
+            <Link href="/terms" className="underline-offset-4 hover:text-deep-fg hover:underline">
+              Terms
+            </Link>
+            <span className="mx-2 opacity-40">·</span>
+            <Link href="/admin/login" className="underline-offset-4 hover:text-deep-fg hover:underline">
+              Admin login
+            </Link>
+          </p>
           <p className="max-w-xl md:text-right">
             Interest rates are indicative and subject to lender policies, credit profile and RBI guidelines.
           </p>
         </div>
+
+        {/* Agency credit */}
+        <p className="mt-4 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-xs text-deep-fg/50 md:justify-start">
+          Designed and developed by
+          <a href="https://kanpix.com/" target="_blank" rel="noopener" className="font-semibold text-deep-fg/80 underline-offset-4 transition hover:text-accent hover:underline">
+            Kanpix
+          </a>
+          , Kanpur
+          <a
+            href="https://www.instagram.com/kanpix78/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Kanpix on Instagram"
+            className="ml-1 grid size-6 place-items-center rounded-full border border-white/15 transition hover:border-accent hover:text-accent"
+          >
+            <InstagramIcon className="size-3" />
+          </a>
+        </p>
       </div>
     </footer>
   );

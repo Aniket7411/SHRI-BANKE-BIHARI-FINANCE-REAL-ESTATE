@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -12,6 +12,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { Button, ButtonA } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/ui/BrandIcons";
 import { LeadForm } from "@/components/forms/LeadForm";
+import { VideoReels } from "@/components/property/VideoReels";
 import { useSite } from "@/components/layout/SiteProvider";
 
 export function PropertyDetail({ property, onClose }: { property: Property | null; onClose: () => void }) {
@@ -40,7 +41,7 @@ function Body({ p }: { p: Property }) {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0"
           >
-            <Image src={p.images[img]} alt={`${p.title} â€” photo ${img + 1}`} fill loading="eager" sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
+            <Image src={p.images[img]} alt={`${p.title} — photo ${img + 1}`} fill loading="eager" sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
           </motion.div>
         </AnimatePresence>
         <div className="absolute bottom-3 left-3 flex gap-2">
@@ -63,17 +64,17 @@ function Body({ p }: { p: Property }) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="eyebrow">
-              {p.type} Â· {p.purpose === "Buy" ? "For Sale" : "For Rent"}
+              {p.type} · {p.purpose === "Buy" ? "For Sale" : "For Rent"}
             </p>
             <h2 className="mt-2 flex items-center gap-2 text-3xl text-ink">
               {p.title}
               {p.verified && <BadgeCheck className="size-5 text-accent" strokeWidth={1.75} />}
             </h2>
             <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-soft">
-              <MapPin className="size-4" strokeWidth={1.5} /> {p.locality}, Kanpur
+              <MapPin className="size-4" strokeWidth={1.5} /> {p.locality}, {p.city}
             </p>
             <Link href={`/properties/${p.id}`} className="mt-2 inline-block text-sm font-semibold text-accent underline-offset-4 hover:underline">
-              View full details â†’
+              View full details →
             </Link>
           </div>
           <div className="text-right">
@@ -93,7 +94,7 @@ function Body({ p }: { p: Property }) {
           {[
             p.beds && { icon: BedDouble, label: "Bedrooms", value: p.beds },
             p.baths && { icon: Bath, label: "Bathrooms", value: p.baths },
-            { icon: Ruler, label: "Area", value: `${p.area.toLocaleString("en-IN")} ftÂ²` },
+            { icon: Ruler, label: "Area", value: `${p.area.toLocaleString("en-IN")} ft²` },
           ]
             .filter(Boolean)
             .map((s) => {
@@ -110,6 +111,8 @@ function Body({ p }: { p: Property }) {
 
         <p className="mt-6 text-[15px] leading-relaxed text-ink-soft">{p.description}</p>
 
+        <VideoReels videos={p.videos} title={p.title} className="mt-8 [&_h2]:text-lg" />
+
         <h3 className="mt-6 text-lg text-ink">Amenities</h3>
         <ul className="mt-3 flex flex-wrap gap-2">
           {p.amenities.map((a) => (
@@ -122,10 +125,10 @@ function Body({ p }: { p: Property }) {
         {emi > 0 && (
           <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-accent-soft p-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-ink">
-              Finance this home from <strong>{s.rates.home}%</strong> p.a. â€” we&apos;ll compare 20+ lenders for you.
+              Finance this home from <strong>{s.rates.home}%</strong> p.a. — we&apos;ll compare 20+ lenders for you.
             </p>
             <Link href="/loans#emi" className="text-sm font-semibold text-accent underline-offset-4 hover:underline">
-              Calculate EMI â†’
+              Calculate EMI →
             </Link>
           </div>
         )}
@@ -156,7 +159,7 @@ function Body({ p }: { p: Property }) {
                 Schedule a visit
               </Button>
               <ButtonA
-                href={whatsappLink(s, `Hi! I'm interested in "${p.title}" (${p.locality}) listed at ${formatPrice(p.price)}.`)}
+                href={whatsappLink(s, `Hi! I'm interested in "${p.title}" (${p.locality}, ${p.city}) listed at ${formatPrice(p.price)}.`)}
                 target="_blank"
                 rel="noreferrer"
                 variant="outline"

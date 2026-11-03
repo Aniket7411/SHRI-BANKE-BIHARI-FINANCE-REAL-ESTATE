@@ -10,7 +10,7 @@ import { TAGS } from "@/lib/cache-tags";
 const schema = z.object({
   name: z.string().min(2, "Add a name"),
   short: z.string().max(200),
-  icon: z.enum(["home", "car", "building", "briefcase", "wallet", "repeat"]),
+  icon: z.enum(["home", "car", "building", "briefcase", "wallet", "repeat", "graduation", "landmark"]),
   rate: z.number({ error: "Enter the rate" }).min(0).max(40, "Rate looks too high"),
   max_tenure_years: z.number({ error: "Enter the tenure" }).int().min(1).max(40),
   max_amount: z.string().max(80),
@@ -18,7 +18,6 @@ const schema = z.object({
   highlights: z.array(z.string()).max(10),
   eligibility: z.array(z.string()).max(15),
   documents: z.array(z.string()).max(20),
-  image: z.string(),
   active: z.boolean(),
 });
 
@@ -40,7 +39,6 @@ export async function saveLoan(fd: FormData): Promise<ActionResult> {
     highlights: lines(fd, "highlights"),
     eligibility: lines(fd, "eligibility"),
     documents: lines(fd, "documents"),
-    image: text(fd, "image"),
     active: bool(fd, "active"),
   });
   if (!parsed.success) return fail("Please fix the highlighted fields", fieldErrors(parsed.error));

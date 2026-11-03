@@ -2,15 +2,17 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
-import { Briefcase, Building2, Car, Check, FileText, House, Repeat, UserCheck, Wallet } from "lucide-react";
+import { BadgeCheck, Briefcase, Building2, Car, Check, FileText, GraduationCap, House, Landmark, Repeat, UserCheck, Wallet } from "lucide-react";
 import { useState } from "react";
 import type { LoanProduct } from "@/lib/types";
 import { whatsappLink } from "@/lib/site";
 import { ButtonA, ButtonLink } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/ui/BrandIcons";
 import { useSite } from "@/components/layout/SiteProvider";
+import { BankLogo } from "./BankLogo";
+import { rateText } from "./BankRateComparison";
 
-const icons = { home: House, car: Car, building: Building2, briefcase: Briefcase, wallet: Wallet, repeat: Repeat };
+const icons = { home: House, car: Car, building: Building2, briefcase: Briefcase, wallet: Wallet, repeat: Repeat, graduation: GraduationCap, landmark: Landmark };
 
 export function LoanProducts({ items }: { items: LoanProduct[] }) {
   const s = useSite();
@@ -86,6 +88,18 @@ export function LoanProducts({ items }: { items: LoanProduct[] }) {
                 </div>
               ))}
             </div>
+
+            {!!p.banks?.length && (
+              <a href="#compare" className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line bg-accent-soft/40 px-6 py-4 text-sm transition-colors hover:bg-accent-soft sm:px-8">
+                <BankLogo bank={p.banks[0].bank} size="sm" />
+                <span className="min-w-0 flex-1 text-ink">
+                  Best rate <strong>{rateText(p.banks[0])}</strong> at {p.banks[0].bank.name}
+                </span>
+                <span className="inline-flex items-center gap-1 font-medium text-accent">
+                  <BadgeCheck className="size-4" /> Compare {p.banks.length} bank{p.banks.length === 1 ? "" : "s"} ↓
+                </span>
+              </a>
+            )}
 
             <div className="grid gap-8 p-6 sm:grid-cols-3 sm:p-8">
               <List title="Highlights" icon={<Check className="size-4" />} items={p.highlights} />

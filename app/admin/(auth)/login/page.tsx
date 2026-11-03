@@ -11,7 +11,7 @@ export default function LoginPage() {
     <div className="grid min-h-dvh place-items-center bg-subtle px-4 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
-          <LogoMark className="size-12" />
+          <LogoMark className="size-20" />
           <p className="mt-3 font-display text-xl text-ink">{site.name}</p>
           <p className="text-xs tracking-[0.2em] text-ink-soft uppercase">Admin &amp; CRM</p>
         </div>

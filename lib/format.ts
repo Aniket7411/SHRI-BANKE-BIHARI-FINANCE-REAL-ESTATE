@@ -28,3 +28,10 @@ export function principalFromEmi(emi: number, annualRate: number, years: number)
   if (emi <= 0) return 0;
   return r === 0 ? emi * n : (emi * ((1 + r) ** n - 1)) / (r * (1 + r) ** n);
 }
+
+/** "3.2 MB", "240 KB" */
+export function formatBytes(n: number) {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
+  return `${(n / 1024 / 1024).toFixed(1).replace(/\.0$/, "")} MB`;
+}

@@ -31,9 +31,28 @@ npm run build && npm start   # production
 - **Rates:** Admin → Loans & rates
 - **Static data:** `lib/data/*` (properties, loans, testimonials, FAQs)
 
+## Going live
+
+The site has no built-in sample content: every listing, loan, review, FAQ, job, offer and document comes from the admin panel.
+
+**Without Supabase keys** the Supabase clients fall back to an empty local database (`lib/demo/db.ts`, saved to `.demo-db.json`, git-ignored). It has no logins, so the admin panel can't be used until Supabase is connected — always set the Supabase env vars on the server.
+
+Sections with no data (featured listings, reviews, FAQs, rates…) hide themselves.
+
+### Deployment checklist
+
+1. **Supabase project** — create one at supabase.com (free tier is fine).
+2. **Run the migrations in order** in SQL Editor: `0001_init.sql` → `0002_crm.sql` → `0003_cms.sql` → `0004_property_details.sql` → `0005_reels.sql` → `0006_cities.sql` → `0007_reviews.sql`.
+3. **Auth** — turn off public sign-ups; create the owner under Authentication → Users (the first user becomes admin).
+4. **Env vars** — copy `.env.example` → `.env.local` (and to your host): Supabase URL, anon key, service-role key, `NEXT_PUBLIC_SITE_URL`.
+5. **Gmail app password** — `SMTP_USER`, `SMTP_PASS` (App passwords), `LEAD_NOTIFY_TO`.
+6. **Content** — add listings, loans, reviews and FAQs in the admin.
+7. **Hosting** — Hostinger Node.js app or VPS (see `HOSTINGER.md`), Vercel, or any Node host, with the same env vars.
+8. **Keep-alive** — free Supabase projects pause after ~7 idle days. `GET /api/health` does a tiny read; `vercel.json` pings it every 3 days on Vercel, and `.github/workflows/keepalive.yml` does the same from GitHub Actions (add repo secret `SITE_URL=https://your-domain.com`).
+
 ## Backend: Supabase + Gmail
 
-Without `.env.local` the site runs on the demo data in `lib/data/*` and logs leads to the console.
+Without Supabase keys the app runs on the empty local fallback described above.
 
 ### 1. Supabase
 1. Create a project at supabase.com.
@@ -41,7 +60,6 @@ Without `.env.local` the site runs on the demo data in `lib/data/*` and logs lea
 3. **Authentication → Sign In / Providers** → turn **off** "Allow new users to sign up" (staff are invited by the admin).
 4. **Authentication → Users → Add user** → create the owner's login. The first user becomes **admin**; later users are **agents**.
 5. Copy `.env.example` to `.env.local` and fill in the URL, anon key and service-role key (Project Settings → API).
-6. `npm run db:seed` imports the current properties, loans, testimonials, FAQs, jobs and settings.
 
 ### 2. Gmail SMTP
 1. Turn on 2-Step Verification for the Gmail account.

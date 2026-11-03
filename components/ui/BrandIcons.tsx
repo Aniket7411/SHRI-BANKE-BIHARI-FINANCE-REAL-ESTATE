@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 /** Brand marks not shipped by lucide. */
 
 export function WhatsAppIcon({ className = "size-5" }: { className?: string }) {
@@ -34,14 +36,7 @@ export function YouTubeIcon({ className = "size-5" }: { className?: string }) {
   );
 }
 
-/** Monogram logo mark. */
+/** Round brand badge (public/brand, from bblogowithoutbg.png). Size it with `className`. */
 export function LogoMark({ className = "size-9" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden>
-      <rect width="40" height="40" rx="12" fill="var(--deep)" />
-      <path d="M10 21.5 20 13l10 8.5" fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M13.5 19.5V28h13v-8.5" fill="none" stroke="var(--deep-fg)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M18 28v-4.5h4V28" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinejoin="round" />
-    </svg>
-  );
+  return <Image src="/brand/logo-256.png" alt="" width={160} height={160} className={`shrink-0 rounded-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] ${className}`} />;
 }

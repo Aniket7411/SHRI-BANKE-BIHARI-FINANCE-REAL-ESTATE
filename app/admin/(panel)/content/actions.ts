@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/admin/auth";
 import { bool, fail, fieldErrors, ok, optNumber, text, type ActionResult } from "@/lib/admin/form";
 import { TAGS } from "@/lib/cache-tags";
+import { videoInfo } from "@/lib/video";
 
 const TABLES = { testimonials: TAGS.testimonials, faqs: TAGS.faqs } as const;
 type Table = keyof typeof TABLES;
@@ -20,6 +21,7 @@ const testimonialSchema = z.object({
   quote: z.string().min(10, "Add the review text").max(1000),
   avatar: z.string(),
   rating: z.number().int().min(1).max(5),
+  reel_url: z.string().refine((v) => !v || videoInfo(v) !== null, "Paste an Instagram reel or YouTube link"),
   active: z.boolean(),
 });
 
@@ -40,6 +42,7 @@ export async function saveContent(fd: FormData): Promise<ActionResult> {
           quote: text(fd, "quote"),
           avatar: text(fd, "avatar"),
           rating: optNumber(fd, "rating") ?? 5,
+          reel_url: text(fd, "reel_url"),
           active: bool(fd, "active"),
         })
       : faqSchema.safeParse({ q: text(fd, "q"), a: text(fd, "a"), active: bool(fd, "active") });
@@ -79,4 +82,17 @@ export async function moveContent(fd: FormData): Promise<ActionResult> {
   await Promise.all(ids.map((id, n) => db.from(t).update({ sort_order: n }).eq("id", id)));
   updateTag(TABLES[t]);
   return ok();
+}
+
+/** Publish a customer review (only if they agreed to show it). */
+export async function approveReview(fd: FormData): Promise<ActionResult> {
+  const { db } = await requireAdmin();
+  const id = text(fd, "id");
+  const { data: row } = await db.from("testimonials").select("consent").eq("id", id).maybeSingle();
+  if (!row) return fail("Review not found");
+  if (row.consent === false) return fail("The customer asked to keep this review private.");
+  const { error } = await db.from("testimonials").update({ active: true }).eq("id", id);
+  if (error) return fail(error.message);
+  updateTag(TAGS.testimonials);
+  return ok("Published on the website");
 }

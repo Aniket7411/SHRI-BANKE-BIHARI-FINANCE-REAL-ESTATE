@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { CircleCheck, LoaderCircle } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { isValidPhone, submitLead } from "@/lib/leads";
 import { whatsappLink } from "@/lib/site";
@@ -18,6 +19,8 @@ const interests: LeadInterest[] = [
   "Home Loan",
   "Vehicle Loan",
   "Loan Against Property",
+  "Education Loan",
+  "OD/CC Limit",
   "Other",
 ];
 
@@ -157,7 +160,12 @@ export function LeadForm({
             </>
           )}
           <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-ink-soft">By submitting you agree to be contacted by our team.</p>
+            <p className="text-xs text-ink-soft">
+              By submitting you agree to be contacted by our team.{" "}
+              <Link href="/privacy" className="font-medium text-accent hover:underline">
+                Privacy Policy
+              </Link>
+            </p>
             <Button type="submit" size="lg" arrow={status !== "sending"} disabled={status === "sending"}>
               {status === "sending" && <LoaderCircle className="size-4 animate-spin" />}
               {status === "sending" ? "Sending…" : submitLabel}

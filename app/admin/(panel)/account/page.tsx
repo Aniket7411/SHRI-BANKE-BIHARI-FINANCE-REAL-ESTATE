@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { KeyRound } from "lucide-react";
 import { requireStaff } from "@/lib/admin/auth";
 import { ActionForm, Field, SubmitButton } from "@/components/admin/forms";
 import { Card, PageHeader } from "@/components/admin/ui";
+import { PasswordInput } from "@/components/admin/PasswordInput";
 import { changePassword, updateProfile } from "./actions";
 
 export const metadata: Metadata = { title: "My account" };
@@ -25,17 +27,26 @@ export default async function AccountPage() {
             <SubmitButton className="mt-1 justify-self-start">Save</SubmitButton>
           </ActionForm>
         </Card>
-        <Card title="Change password">
-          <ActionForm action={changePassword} resetOnSuccess className="grid gap-3">
-            <Field label="New password" name="password" hint="At least 8 characters.">
-              <input name="password" type="password" autoComplete="new-password" className="field-sm" />
-            </Field>
-            <Field label="Confirm new password" name="confirm">
-              <input name="confirm" type="password" autoComplete="new-password" className="field-sm" />
-            </Field>
-            <SubmitButton className="mt-1 justify-self-start">Update password</SubmitButton>
-          </ActionForm>
-        </Card>
+        {staff.role !== "admin" ? (
+          <Card title="Password">
+            <p className="flex items-start gap-3 text-sm text-ink-soft">
+              <KeyRound className="mt-0.5 size-4 shrink-0 text-accent" />
+              Your login is managed by your admin. If you forget your password, ask them to set a new one for you.
+            </p>
+          </Card>
+        ) : (
+          <Card title="Change password">
+            <ActionForm action={changePassword} resetOnSuccess className="grid gap-3">
+              <Field label="New password" name="password" hint="At least 8 characters.">
+                <PasswordInput name="password" autoComplete="new-password" />
+              </Field>
+              <Field label="Confirm new password" name="confirm">
+                <PasswordInput name="confirm" autoComplete="new-password" />
+              </Field>
+              <SubmitButton className="mt-1 justify-self-start">Update password</SubmitButton>
+            </ActionForm>
+          </Card>
+        )}
       </div>
     </>
   );

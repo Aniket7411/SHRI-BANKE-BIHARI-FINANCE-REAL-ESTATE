@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { requireAdmin } from "@/lib/admin/auth";
 import { ActionButton, ActionForm, Field, LinesInput, SubmitButton, Toggle } from "@/components/admin/forms";
-import { ImagePicker } from "@/components/admin/MediaManager";
 import { Card, PageHeader } from "@/components/admin/ui";
 import { deleteLoan, saveLoan } from "../actions";
 
@@ -16,6 +15,8 @@ const ICONS = [
   ["briefcase", "Briefcase"],
   ["wallet", "Wallet"],
   ["repeat", "Transfer"],
+  ["graduation", "Graduation cap"],
+  ["landmark", "Bank"],
 ];
 
 export default async function LoanEditPage({ params }: PageProps<"/admin/loans/[id]">) {
@@ -29,7 +30,7 @@ export default async function LoanEditPage({ params }: PageProps<"/admin/loans/[
     <>
       <PageHeader
         title={l?.name ?? "New loan product"}
-        back={{ href: "/admin/loans", label: "Loans & rates" }}
+        back={{ href: "/admin/loans", label: "Loan products" }}
         actions={
           l && l.id !== "home" && l.id !== "vehicle" ? (
             <ActionButton action={deleteLoan} fields={{ id: l.id, redirect: "1" }} variant="danger" confirm={`Delete ${l.name}?`}>
@@ -58,7 +59,7 @@ export default async function LoanEditPage({ params }: PageProps<"/admin/loans/[
               <Field label="Short description" name="short" className="sm:col-span-2">
                 <input name="short" defaultValue={l?.short} className="field-sm" />
               </Field>
-              <Field label="Starting rate (% p.a.)" name="rate">
+              <Field label="Fallback rate (% p.a.)" name="rate" hint="Shown only while this loan has no bank rates.">
                 <input name="rate" type="number" step="0.01" defaultValue={l ? Number(l.rate) : undefined} className="field-sm" />
               </Field>
               <Field label="Max tenure (years)" name="max_tenure_years">
@@ -87,8 +88,10 @@ export default async function LoanEditPage({ params }: PageProps<"/admin/loans/[
           </Card>
         </div>
         <div className="grid content-start gap-6">
-          <Card title="Image">
-            <ImagePicker name="image" folder="loans" defaultValue={l?.image} />
+          <Card title="Bank rates" text="Each bank's rate for this loan is set in Bank rates; the lowest one is shown as “from x%” on the website.">
+            <a href={l ? `/admin/rates?loan=${l.id}` : "/admin/rates"} className="text-sm font-medium text-accent hover:underline">
+              Open Bank rates →
+            </a>
           </Card>
           <Card title="Visibility">
             <div className="grid gap-3">

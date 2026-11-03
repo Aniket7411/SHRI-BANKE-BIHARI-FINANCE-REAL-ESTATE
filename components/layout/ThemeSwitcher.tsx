@@ -16,7 +16,8 @@ export const THEME_KEY = "sbb:theme";
 /** Runs before paint (in <head>) so the saved theme never flashes. */
 export const themeInitScript = `try{var t=localStorage.getItem("${THEME_KEY}");if(t)document.documentElement.dataset.theme=t}catch(e){}`;
 
-export function ThemeSwitcher({ align = "right" }: { align?: "left" | "right" }) {
+/** `up`: open the list above the button (e.g. at the bottom of the mobile menu). */
+export function ThemeSwitcher({ align = "right", up = false }: { align?: "left" | "right"; up?: boolean }) {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<ThemeId>("ivory");
   const ref = useRef<HTMLDivElement>(null);
@@ -60,7 +61,7 @@ export function ThemeSwitcher({ align = "right" }: { align?: "left" | "right" })
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className={`absolute top-12 z-50 w-60 origin-top rounded-2xl border border-line bg-surface p-1.5 shadow-soft ${
+            className={`absolute z-50 w-60 rounded-2xl border border-line bg-surface p-1.5 shadow-soft ${up ? "bottom-12 origin-bottom" : "top-12 origin-top"} ${
               align === "right" ? "right-0" : "left-0"
             }`}
           >

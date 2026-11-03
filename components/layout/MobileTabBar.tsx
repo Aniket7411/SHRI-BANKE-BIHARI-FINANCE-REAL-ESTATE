@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { Building2, House, Landmark, Phone } from "lucide-react";
+import { Building2, House, Info, Landmark, Phone } from "lucide-react";
 import { nav } from "@/lib/site";
 import { isActive } from "./Header";
 
-const icons = { home: House, building: Building2, landmark: Landmark, phone: Phone };
+const icons = { home: House, building: Building2, landmark: Landmark, phone: Phone, info: Info };
+/** The bottom bar has room for four tabs; About stays in the menu. */
+const tabs = nav.filter((item) => item.href !== "/about");
 
 /** Native-app style bottom navigation, phones only. */
 export function MobileTabBar() {
@@ -18,7 +20,7 @@ export function MobileTabBar() {
       className="pb-safe fixed bg-surface shadow-[0_-6px_24px_-14px_rgba(15,27,45,0.2)] inset-x-0 bottom-0 z-50 border-t border-line md:hidden"
     >
       <ul className="grid grid-cols-4">
-        {nav.map((item) => {
+        {tabs.map((item) => {
           const Icon = icons[item.icon];
           const active = isActive(pathname, item.href);
           return (

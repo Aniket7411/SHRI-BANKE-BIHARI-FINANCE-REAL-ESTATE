@@ -53,7 +53,9 @@ export const slugify = (s: string) =>
 
 /** Public-bucket object path from a Supabase Storage public URL (null for external URLs). */
 export function mediaPath(url: string) {
-  const marker = "/storage/v1/object/public/media/";
-  const i = url.indexOf(marker);
-  return i === -1 ? null : decodeURIComponent(url.slice(i + marker.length).split("?")[0]);
+  for (const marker of ["/storage/v1/object/public/media/", "/api/demo-files/media/"]) {
+    const i = url.indexOf(marker);
+    if (i !== -1) return decodeURIComponent(url.slice(i + marker.length).split("?")[0]);
+  }
+  return null;
 }

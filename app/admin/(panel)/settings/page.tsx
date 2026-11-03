@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getSiteSettings } from "@/lib/api";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { DatabaseWarning } from "@/components/admin/DatabaseWarning";
 import { ActionForm, Field, SubmitButton } from "@/components/admin/forms";
 import { Card, PageHeader } from "@/components/admin/ui";
 import { saveSettings } from "./actions";
@@ -16,11 +18,19 @@ export default async function SettingsPage() {
   return (
     <>
       <PageHeader title="Settings" text="Contact details used across the website, emails and the WhatsApp button." />
+      {!isSupabaseConfigured && (
+        <div className="mb-6">
+          <DatabaseWarning />
+        </div>
+      )}
       <ActionForm action={saveSettings} className="grid gap-6">
         <Card title="Contact details">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Phone (shown on site)" name="phone">
               <input name="phone" defaultValue={s.phone} className="field-sm" />
+            </Field>
+            <Field label="Second phone (calls only)" name="phone2" hint="Shown on the Contact page and footer. Not used for WhatsApp. Leave empty to hide.">
+              <input name="phone2" defaultValue={s.phone2} className="field-sm" />
             </Field>
             <Field label="WhatsApp number" name="whatsapp" hint="Country code + number, digits only: 919876543210">
               <input name="whatsapp" defaultValue={s.whatsapp} inputMode="numeric" className="field-sm" />

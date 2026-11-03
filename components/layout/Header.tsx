@@ -9,15 +9,17 @@ import { nav, site, telLink } from "@/lib/site";
 import { LogoMark } from "@/components/ui/BrandIcons";
 import { ButtonLink } from "@/components/ui/Button";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { CityPicker } from "./CityPicker";
+import { MobileMenu } from "./MobileMenu";
 import { useSite } from "@/components/layout/SiteProvider";
 
 export function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2.5" aria-label={`${site.fullName} — home`}>
-      <LogoMark className="size-9 shrink-0" />
+    <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-3" aria-label={`${site.fullName} — home`}>
+      <LogoMark className="size-[52px] shrink-0 sm:size-14" />
       <span className="leading-none">
-        <span className="font-display block text-[17px] whitespace-nowrap text-ink">{site.name}</span>
-        <span className="mt-1 block text-[9.5px] font-semibold tracking-[0.22em] whitespace-nowrap text-ink-soft uppercase">
+        <span className="font-display block text-base whitespace-nowrap text-ink sm:text-[17px]">{site.name}</span>
+        <span className="mt-1 block text-[9px] font-semibold tracking-[0.12em] whitespace-nowrap text-ink-soft uppercase sm:text-[9.5px] sm:tracking-[0.22em]">
           Finance &amp; Real Estate
         </span>
       </span>
@@ -39,7 +41,7 @@ export function Header() {
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 8));
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
+    <header className="fixed inset-x-0 top-[var(--offer-bar,0px)] z-50 transition-[top] duration-300 ease-out">
       <div
         className={`border-b bg-surface transition-shadow duration-300 ${
           scrolled ? "border-line shadow-[0_6px_24px_-12px_rgba(15,27,45,0.18)]" : "border-line/60"
@@ -72,12 +74,18 @@ export function Header() {
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
-            <ThemeSwitcher />
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            {/* Phones: one menu button only — city, theme and call all live inside the menu */}
+            <div className="hidden md:block">
+              <CityPicker />
+            </div>
+            <div className="hidden md:block">
+              <ThemeSwitcher />
+            </div>
             <a
               href={telLink(s)}
               aria-label="Call us"
-              className="grid size-10 place-items-center rounded-full border border-line text-ink transition hover:border-accent hover:text-accent lg:hidden"
+              className="hidden size-10 place-items-center rounded-full border border-line text-ink transition hover:border-accent hover:text-accent md:grid lg:hidden"
             >
               <Phone className="size-[17px]" strokeWidth={1.5} />
             </a>
@@ -86,6 +94,7 @@ export function Header() {
                 Free consultation
               </ButtonLink>
             </div>
+            <MobileMenu />
           </div>
         </div>
       </div>

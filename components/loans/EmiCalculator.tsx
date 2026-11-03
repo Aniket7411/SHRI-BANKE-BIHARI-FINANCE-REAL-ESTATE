@@ -1,10 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { calcEmi, formatINR, formatPrice } from "@/lib/format";
 import { ButtonLink } from "@/components/ui/Button";
+import type { LoanProduct } from "@/lib/types";
 
+/** Example loan per tab; the rate comes from the live loan products (lowest bank rate) when given. */
 const presets = [
   { id: "home", label: "Home", rate: 7.15, amount: 4000000, years: 20, maxYears: 30 },
   { id: "vehicle", label: "Vehicle", rate: 7.55, amount: 800000, years: 5, maxYears: 7 },
@@ -12,11 +14,15 @@ const presets = [
 ] as const;
 
 /** Full EMI calculator with principal/interest donut and yearly schedule. */
-export function EmiCalculator() {
+export function EmiCalculator({ loans = [] }: { loans?: LoanProduct[] }) {
+  const product = (id: string) => loans.find((l) => l.id === id);
+  const rateOf = (id: (typeof presets)[number]["id"]) => product(id)?.rate ?? presets.find((x) => x.id === id)!.rate;
   const [preset, setPreset] = useState<(typeof presets)[number]["id"]>("home");
   const p = presets.find((x) => x.id === preset)!;
+  const offers = product(preset)?.banks ?? [];
   const [amount, setAmount] = useState<number>(p.amount);
-  const [rate, setRate] = useState<number>(p.rate);
+  const [rate, setRate] = useState<number>(() => rateOf("home"));
+  const [bank, setBank] = useState("");
   const [years, setYears] = useState<number>(p.years);
   const [showTable, setShowTable] = useState(false);
 
@@ -24,12 +30,18 @@ export function EmiCalculator() {
     const n = presets.find((x) => x.id === id)!;
     setPreset(id);
     setAmount(n.amount);
-    setRate(n.rate);
+    setRate(rateOf(id));
+    setBank("");
     setYears(n.years);
+  };
+  const pickBank = (id: string) => {
+    setBank(id);
+    const o = offers.find((x) => x.bank.id === id);
+    setRate(o ? o.rateMin : rateOf(preset));
   };
 
   const { emi, total, interest } = calcEmi(amount, rate, years);
-  const schedule = useMemo(() => yearly(amount, rate, years, emi), [amount, rate, years, emi]);
+  const schedule = yearly(amount, rate, years, emi); // memoized by the React Compiler
 
   return (
     <div className="grid overflow-hidden rounded-[28px] border border-line bg-surface lg:grid-cols-[1.1fr_1fr]">
@@ -53,6 +65,20 @@ export function EmiCalculator() {
           ))}
         </div>
 
+        {offers.length > 0 && (
+          <label className="mt-6 block">
+            <span className="mb-1.5 block text-sm text-ink-soft">Bank</span>
+            <select value={bank} onChange={(e) => pickBank(e.target.value)} className="field-sm max-w-xs">
+              <option value="">Best available rate · {offers[0].rateMin}%</option>
+              {offers.map((o) => (
+                <option key={o.bank.id} value={o.bank.id}>
+                  {o.bank.name} · from {o.rateMin}%
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
         <div className="mt-8 space-y-8">
           <Slider
             label="Loan amount"
@@ -70,7 +96,10 @@ export function EmiCalculator() {
             min={6}
             max={16}
             step={0.05}
-            onChange={setRate}
+            onChange={(v) => {
+              setRate(v);
+              setBank("");
+            }}
           />
           <Slider
             label="Tenure"

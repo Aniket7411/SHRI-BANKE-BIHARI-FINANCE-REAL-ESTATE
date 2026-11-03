@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ArrowUpRight, Clock, Mail, MapPin, Phone } from "lucide-react";
 import { getFaqs, getSiteSettings } from "@/lib/api";
 import { IMG } from "@/lib/img";
-import { site, telLink, whatsappLink } from "@/lib/site";
+import { site, telLink, telHref, whatsappLink } from "@/lib/site";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal, RevealItem, Stagger } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -12,7 +12,8 @@ import { ContactTabs } from "@/components/contact/ContactTabs";
 
 export const metadata: Metadata = {
   title: "Contact us",
-  description: `Talk to ${site.fullName} — call, WhatsApp or visit our office in Kanpur. Free property and loan consultation.`,
+  description: `Talk to ${site.fullName} — call, WhatsApp or visit us for a free property and home loan consultation in Kanpur & Lucknow.`,
+  alternates: { canonical: "/contact" },
 };
 
 export default async function ContactPage() {
@@ -20,6 +21,7 @@ export default async function ContactPage() {
   const channels = [
   { icon: <WhatsAppIcon className="size-5" />, label: "WhatsApp", value: "Chat instantly", href: whatsappLink(s), tint: "text-wa", external: true },
   { icon: <Phone className="size-5" strokeWidth={1.5} />, label: "Call us", value: s.phone, href: telLink(s), tint: "text-accent" },
+  ...(s.phone2 ? [{ icon: <Phone className="size-5" strokeWidth={1.5} />, label: "Call us (alternate)", value: s.phone2, href: telHref(s.phone2), tint: "text-accent" }] : []),
   { icon: <Mail className="size-5" strokeWidth={1.5} />, label: "Email", value: s.email, href: `mailto:${s.email}`, tint: "text-accent" },
   { icon: <InstagramIcon className="size-5" />, label: "Instagram", value: s.instagramHandle, href: s.instagram, tint: "text-accent", external: true },
   ];
@@ -38,7 +40,7 @@ export default async function ContactPage() {
         image={IMG.meeting}
       />
 
-      <section className="container-app py-12 sm:py-16">
+      <section className="container-app py-10 sm:py-12">
         <Stagger className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {channels.map((c) => (
             <RevealItem key={c.label}>
@@ -59,7 +61,7 @@ export default async function ContactPage() {
         </Stagger>
       </section>
 
-      <section className="container-app grid gap-10 pb-16 sm:pb-24 lg:grid-cols-[1fr_1.1fr]">
+      <section className="container-app grid gap-10 pb-12 sm:pb-16 lg:grid-cols-[1fr_1.1fr]">
         <div className="space-y-6">
           <SectionHeading
             eyebrow="Visit our office"
@@ -95,7 +97,8 @@ export default async function ContactPage() {
         </Reveal>
       </section>
 
-      <section className="bg-subtle py-20 sm:py-24">
+      {faqs.length > 0 && (
+      <section className="bg-subtle py-14 sm:py-16">
         <div className="container-app grid gap-10 lg:grid-cols-[1fr_1.6fr]">
           <SectionHeading eyebrow="FAQs" title="Before you reach out." text="Quick answers to what most clients ask us first." />
           <Reveal>
@@ -103,6 +106,7 @@ export default async function ContactPage() {
           </Reveal>
         </div>
       </section>
+      )}
     </>
   );
 }

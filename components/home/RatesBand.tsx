@@ -27,7 +27,7 @@ export function RatesBand({ loans }: { loans: LoanProduct[] }) {
   const emi = calcEmi(r.amount, r.rate, r.tenure).emi;
 
   return (
-    <section className="relative overflow-hidden bg-deep py-20 text-deep-fg sm:py-28">
+    <section className="relative overflow-hidden bg-deep py-14 text-deep-fg sm:py-16">
       <div aria-hidden className="pointer-events-none absolute -right-40 -bottom-40 size-[520px] rounded-full bg-accent/15 blur-[120px]" />
       <div className="container-app relative grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
         <Reveal>

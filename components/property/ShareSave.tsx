@@ -4,7 +4,8 @@ import { Heart, Share2 } from "lucide-react";
 import { useFavorites } from "@/lib/useFavorites";
 import { useToast } from "@/components/ui/Toast";
 
-export function ShareSave({ id, title }: { id: string; title: string }) {
+/** Share / Save buttons. `compact` = icon-only circles (summary box). */
+export function ShareSave({ id, title, compact = false }: { id: string; title: string; compact?: boolean }) {
   const fav = useFavorites();
   const toast = useToast();
   const saved = fav.has(id);
@@ -23,13 +24,15 @@ export function ShareSave({ id, title }: { id: string; title: string }) {
     }
   };
 
-  const btn =
-    "inline-flex h-10 items-center gap-2 rounded-full border border-line px-4 text-sm font-medium text-ink transition hover:border-ink/40";
+  const btn = compact
+    ? "grid size-9 shrink-0 place-items-center rounded-full border border-line text-ink transition hover:border-ink/40"
+    : "inline-flex h-10 items-center gap-2 rounded-full border border-line px-4 text-sm font-medium text-ink transition hover:border-ink/40";
 
   return (
     <div className="flex gap-2">
-      <button onClick={share} className={btn}>
-        <Share2 className="size-4" strokeWidth={1.75} /> Share
+      <button onClick={share} className={btn} aria-label="Share">
+        <Share2 className="size-4" strokeWidth={1.75} />
+        {!compact && " Share"}
       </button>
       <button
         onClick={() => {
@@ -37,10 +40,11 @@ export function ShareSave({ id, title }: { id: string; title: string }) {
           toast({ title: saved ? "Removed from saved" : "Saved to your shortlist" });
         }}
         aria-pressed={saved}
+        aria-label={saved ? "Remove from saved" : "Save"}
         className={btn}
       >
         <Heart className={`size-4 ${saved ? "fill-red-500 text-red-500" : ""}`} strokeWidth={1.75} />
-        {saved ? "Saved" : "Save"}
+        {!compact && (saved ? "Saved" : "Save")}
       </button>
     </div>
   );

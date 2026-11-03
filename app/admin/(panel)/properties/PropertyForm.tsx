@@ -2,16 +2,18 @@ import { ActionForm, ChipsInput, Field, SubmitButton, Toggle } from "@/component
 import { MediaManager } from "@/components/admin/MediaManager";
 import { Card } from "@/components/admin/ui";
 import { LISTING_STATUSES } from "@/lib/admin/meta";
+import type { City } from "@/lib/cities";
 import type { Property } from "@/lib/types";
-import { PriceInput } from "./PriceInput";
+import { PropertyFields } from "./PropertyFields";
 import { saveProperty } from "./actions";
 
-const TYPES = ["Apartment", "Villa", "House", "Plot", "Commercial"] as const;
-const COMMON_AMENITIES = ["Lift", "Power backup", "Covered parking", "Gated society", "24×7 security", "CCTV", "Gym", "Swimming pool", "Club house", "Park", "Modular kitchen", "Solar panels", "Water supply 24×7", "Vastu compliant"];
+const COMMON_AMENITIES = ["Lift", "Power backup", "Covered parking", "Gated society", "24×7 security", "CCTV", "Gym", "Swimming pool", "Club house", "Park", "Modular kitchen", "Solar panels", "Water supply 24×7", "Vastu compliant", "Intercom", "Fire safety", "Rain water harvesting", "Visitor parking", "Children's play area", "Wheelchair access"];
+
+const MAX_PHOTOS = 6;
 
 type Editable = Property & { status?: string };
 
-export function PropertyForm({ property, localities, amenities }: { property?: Editable; localities: string[]; amenities: string[] }) {
+export function PropertyForm({ property, cities, amenities }: { property?: Editable; cities: City[]; amenities: string[] }) {
   const p = property;
   const folder = `properties/${p?.id ?? "new"}`;
   return (
@@ -19,65 +21,13 @@ export function PropertyForm({ property, localities, amenities }: { property?: E
       {p && <input type="hidden" name="id" value={p.id} />}
 
       <div className="grid min-w-0 gap-6">
-        <Card title="Basics">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Title" name="title" className="sm:col-span-2">
-              <input name="title" defaultValue={p?.title} placeholder="e.g. Sunlit 3 BHK Residence" className="field-sm" />
-            </Field>
-            <Field label="Property type" name="type">
-              <select name="type" defaultValue={p?.type ?? "Apartment"} className="field-sm">
-                {TYPES.map((t) => (
-                  <option key={t}>{t}</option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Listing for" name="purpose">
-              <select name="purpose" defaultValue={p?.purpose ?? "Buy"} className="field-sm">
-                <option value="Buy">Sale</option>
-                <option value="Rent">Rent</option>
-              </select>
-            </Field>
-            <Field label="Locality" name="locality">
-              <input name="locality" defaultValue={p?.locality} list="localities" placeholder="e.g. Swaroop Nagar" className="field-sm" />
-              <datalist id="localities">
-                {localities.map((l) => (
-                  <option key={l} value={l} />
-                ))}
-              </datalist>
-            </Field>
-            <Field label="Price (₹)" name="price" hint="Total price for sale, monthly rent for rentals.">
-              <PriceInput name="price" defaultValue={p?.price} />
-            </Field>
-            <Field label="Built-up area (sq.ft)" name="area">
-              <input name="area" type="number" inputMode="numeric" min={1} defaultValue={p?.area} className="field-sm" />
-            </Field>
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Bedrooms" name="beds">
-                <input name="beds" type="number" inputMode="numeric" min={0} defaultValue={p?.beds} className="field-sm" />
-              </Field>
-              <Field label="Bathrooms" name="baths">
-                <input name="baths" type="number" inputMode="numeric" min={0} defaultValue={p?.baths} className="field-sm" />
-              </Field>
-            </div>
-            <Field label="Description" name="description" className="sm:col-span-2">
-              <textarea name="description" defaultValue={p?.description} rows={5} className="field-sm resize-y" placeholder="Highlights, nearby landmarks, condition, floor…" />
-            </Field>
-            {!p && (
-              <Field label="Web address (optional)" name="slug" className="sm:col-span-2" hint="Leave blank to create one from the title. It can't be changed later.">
-                <div className="flex items-center gap-1 text-sm text-ink-soft">
-                  /properties/
-                  <input name="slug" placeholder="swaroop-nagar-3bhk" className="field-sm" />
-                </div>
-              </Field>
-            )}
-          </div>
+        <PropertyFields property={p} cities={cities} />
+
+        <Card title="Photos" text="Up to 6 photos. Drag them in and reorder with the arrows. The first photo is shown on cards.">
+          <MediaManager name="images" kind="image" folder={folder} defaultValue={p?.images} max={MAX_PHOTOS} />
         </Card>
 
-        <Card title="Photos" text="Drag photos in, reorder with the arrows. The first photo is shown on cards.">
-          <MediaManager name="images" kind="image" folder={folder} defaultValue={p?.images} />
-        </Card>
-
-        <Card title="Video tour" text="Optional. Upload a short clip or paste a YouTube link.">
+        <Card title="Video tour" text="Optional. Paste Instagram reel or YouTube link — we embed it, nothing is uploaded.">
           <MediaManager name="videos" kind="video" folder={folder} defaultValue={p?.videos} max={5} />
         </Card>
 

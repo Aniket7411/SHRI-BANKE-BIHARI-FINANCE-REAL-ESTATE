@@ -127,19 +127,38 @@ function ConfirmSubmit({ confirm, variant, title, children }: { confirm?: string
   );
 }
 
+/** New line or comma: separates several values typed or pasted at once. */
+const LIST_SEP = /[\r\n,]/;
+
 /** Tag-style list input. Submits a JSON array under `name`. */
 export function ChipsInput({ name, defaultValue = [], placeholder = "Type and press Enter", suggestions = [] }: { name: string; defaultValue?: string[]; placeholder?: string; suggestions?: string[] }) {
   const [items, setItems] = useState(defaultValue);
   const [text, setText] = useState("");
+  const hidden = useRef<HTMLInputElement>(null);
+  /** Adds one value, or several when a list (lines / commas) is pasted. */
   const add = (v: string) => {
-    const t = v.trim();
-    if (t && !items.includes(t)) setItems([...items, t]);
+    const fresh = v
+      .split(LIST_SEP)
+      .map((t) => t.trim())
+      .filter(Boolean);
+    setItems((cur) => [...cur, ...fresh.filter((t, i) => !cur.includes(t) && fresh.indexOf(t) === i)]);
     setText("");
   };
+  // Clear back to the defaults when the surrounding form resets (e.g. after "Add").
+  useEffect(() => {
+    const form = hidden.current?.form;
+    if (!form) return;
+    const onReset = () => {
+      setItems(defaultValue);
+      setText("");
+    };
+    form.addEventListener("reset", onReset);
+    return () => form.removeEventListener("reset", onReset);
+  }, [defaultValue]);
   const unused = suggestions.filter((s) => !items.includes(s));
   return (
     <div>
-      <input type="hidden" name={name} value={JSON.stringify(items)} />
+      <input ref={hidden} type="hidden" name={name} value={JSON.stringify(items)} />
       <div className="field-sm flex flex-wrap items-center gap-1.5 !py-1.5">
         {items.map((i) => (
           <span key={i} className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent-strong">
@@ -151,7 +170,14 @@ export function ChipsInput({ name, defaultValue = [], placeholder = "Type and pr
         ))}
         <input
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => (LIST_SEP.test(e.target.value) ? add(e.target.value) : setText(e.target.value))}
+          onPaste={(e) => {
+            const pasted = e.clipboardData.getData("text");
+            if (LIST_SEP.test(pasted)) {
+              e.preventDefault();
+              add(text + pasted);
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === ",") {
               e.preventDefault();

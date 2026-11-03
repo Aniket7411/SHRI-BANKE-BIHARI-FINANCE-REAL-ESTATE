@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ArrowRight, Quote, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, Quote, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Testimonial } from "@/lib/types";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -18,7 +18,7 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
   };
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || items.length < 2) return;
     const t = setInterval(() => {
       setDir(1);
       setI((v) => (v + 1) % items.length);
@@ -27,9 +27,10 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
   }, [paused, items.length]);
 
   const t = items[i];
+  if (!t) return null; // no testimonials (live mode): hide the section
 
   return (
-    <section className="container-app py-20 sm:py-28">
+    <section className="container-app py-14 sm:py-16">
       <SectionHeading align="center" eyebrow="Client stories" title="Kind words from happy homeowners." />
 
       <div
@@ -68,6 +69,11 @@ export function Testimonials({ items }: { items: Testimonial[] }) {
                 <div className="text-left">
                   <p className="text-sm font-semibold text-ink">{t.name}</p>
                   <p className="text-xs text-ink-soft">{t.role}</p>
+                  {t.verifiedBuyer && (
+                    <p className="mt-0.5 flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                      <BadgeCheck className="size-3.5" /> Verified buyer
+                    </p>
+                  )}
                 </div>
                 <span className="ml-2 flex" aria-label={`${t.rating} out of 5 stars`}>
                   {Array.from({ length: t.rating }).map((_, k) => (

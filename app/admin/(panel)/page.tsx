@@ -3,6 +3,8 @@ import { AlarmClock, Briefcase, Building2, Inbox, TrendingUp, Trophy } from "luc
 import { requireStaff } from "@/lib/admin/auth";
 import { leadStatus, timeAgo } from "@/lib/admin/meta";
 import { Badge, Card, Empty, PageHeader } from "@/components/admin/ui";
+import { TeamPerformance } from "@/components/admin/crm/TeamPerformance";
+import { fmtFollowUp } from "@/lib/admin/crm-meta";
 
 export default async function DashboardPage({ searchParams }: PageProps<"/admin">) {
   const { staff, db } = await requireStaff();
@@ -77,21 +79,29 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-        <Card title="Latest leads" text="Newest enquiries from the website and ads">
+        <Card
+          title="Latest leads"
+          text="Newest enquiries from the website and ads"
+          actions={
+            <Link href="/admin/leads" className="text-xs font-medium text-accent hover:underline">
+              All leads →
+            </Link>
+          }
+        >
           {recent.data?.length ? (
             <ul className="-mx-2 divide-y divide-line">
               {recent.data.map((l) => {
                 const st = leadStatus(l.status);
                 return (
                   <li key={l.id} className="flex items-center gap-3 px-2 py-2.5">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-ink">
+                    <Link href={`/admin/leads/${l.id}`} className="group min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-ink group-hover:text-accent">
                         {l.name} <span className="font-normal text-ink-soft">· L-{l.ref}</span>
                       </p>
                       <p className="truncate text-xs text-ink-soft">
                         {l.interest} · {l.source} · {timeAgo(l.created_at)}
                       </p>
-                    </div>
+                    </Link>
                     <a href={`tel:${l.phone}`} className="hidden text-xs text-ink-soft hover:text-accent sm:block">
                       {l.phone}
                     </a>
@@ -105,7 +115,15 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
           )}
         </Card>
 
-        <Card title="Follow-ups due" text="Today and overdue">
+        <Card
+          title="Follow-ups due"
+          text="Today and overdue"
+          actions={
+            <Link href="/admin/follow-ups" className="text-xs font-medium text-accent hover:underline">
+              View all →
+            </Link>
+          }
+        >
           {due.data?.length ? (
             <ul className="-mx-2 divide-y divide-line">
               {due.data.map((l) => {
@@ -113,10 +131,15 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
                 return (
                   <li key={l.id} className="flex items-center justify-between gap-3 px-2 py-2.5">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-ink">{l.name}</p>
-                      <a href={`tel:${l.phone}`} className="text-xs text-ink-soft hover:text-accent">
-                        {l.phone}
-                      </a>
+                      <Link href={`/admin/leads/${l.id}`} className="block truncate text-sm font-medium text-ink hover:text-accent">
+                        {l.name}
+                      </Link>
+                      <p className="truncate text-xs text-ink-soft">
+                        <a href={`tel:${l.phone}`} className="hover:text-accent">
+                          {l.phone}
+                        </a>{" "}
+                        · {fmtFollowUp(l.follow_up_at)}
+                      </p>
                     </div>
                     <Badge tone={overdue ? "red" : "amber"}>{overdue ? "Overdue" : "Today"}</Badge>
                   </li>
@@ -128,6 +151,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
           )}
         </Card>
       </div>
+
+      {isAdmin && (
+        <div className="mt-6">
+          <TeamPerformance db={db} />
+        </div>
+      )}
     </>
   );
 }

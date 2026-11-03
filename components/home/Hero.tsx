@@ -3,18 +3,21 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
-import { BadgeCheck, Car, House, MapPin, Search, Star } from "lucide-react";
+import { BadgeCheck, Car, CircleCheck, House, MapPin, Search, Star } from "lucide-react";
 import { useRef, useState } from "react";
 import { IMG } from "@/lib/img";
+import heroFamily from "@/public/hero-family.webp";
 import { calcEmi, formatINR, formatPrice } from "@/lib/format";
+import { CATEGORIES, PROPERTY_TYPES } from "@/lib/property-meta";
 import { Button } from "@/components/ui/Button";
 import { useSite } from "@/components/layout/SiteProvider";
-import { site } from "@/lib/site";
+import { useCity } from "@/components/layout/CityProvider";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const tabs = ["Buy", "Rent", "Loan"] as const;
 
-export function Hero({ localities }: { localities: string[] }) {
+export function Hero() {
+  const { label } = useCity();
   const s = useSite();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -22,12 +25,12 @@ export function Hero({ localities }: { localities: string[] }) {
   const cardY = useTransform(scrollYProgress, [0, 1], [0, -60]);
 
   return (
-    <section ref={ref} className="relative overflow-hidden pt-24 pb-14 sm:pt-28 lg:pt-32 lg:pb-24">
+    <section ref={ref} className="relative overflow-hidden pt-20 pb-12 sm:pt-24 lg:pt-24 lg:pb-12">
       <div
         aria-hidden
         className="pointer-events-none absolute top-0 right-0 -z-10 h-[620px] w-[620px] translate-x-1/3 -translate-y-1/3 rounded-full bg-accent-soft blur-3xl"
       />
-      <div className="container-app grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+      <div className="container-app grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-stretch lg:gap-14">
         <div>
           <motion.span
             initial={{ opacity: 0, y: 12 }}
@@ -36,49 +39,80 @@ export function Hero({ localities }: { localities: string[] }) {
             className="inline-flex items-center gap-2 rounded-full border border-line bg-surface py-1 pr-3 pl-1 text-xs text-ink-soft"
           >
             <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent-fg uppercase">
-              New
+              One-step
             </span>
-            Home loans now from {s.rates.home}% p.a.
+            Property + loan + paperwork, all under one roof
           </motion.span>
 
-          <h1 className="mt-6 text-[clamp(2.4rem,6vw,4.4rem)] leading-[1.04] text-ink">
-            {["Find the home.", "We'll fund", "the dream."].map((line, i) => (
-              <span key={line} className="block overflow-hidden pb-1">
-                <motion.span
-                  className={`block ${i === 1 ? "text-accent" : ""}`}
-                  initial={{ y: "105%" }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 1, ease, delay: 0.1 + i * 0.1 }}
-                >
-                  {line}
-                </motion.span>
-              </span>
-            ))}
+          <h1 className="mt-5 text-ink">
+            {/* Small keyword line first, so the page's only <h1> says what we do and where. */}
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease, delay: 0.05 }}
+              className="mb-2 block font-sans text-[13px] font-semibold tracking-[0.16em] text-accent uppercase sm:text-sm"
+            >
+              Property &amp; home loans in {label}
+            </motion.span>
+            {/* Two lines: "Find it. Fund it." / "Move in." */}
+            <span className="block text-[clamp(2.4rem,5.2vw,4rem)] leading-[1.02]">
+              {[
+                [
+                  ["Find it. ", ""],
+                  ["Fund it.", "text-accent"],
+                ],
+                [["Move in.", ""]],
+              ].map((parts, i) => (
+                <span key={i} className="block overflow-hidden pb-1">
+                  <motion.span className="block" initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: 1, ease, delay: 0.1 + i * 0.12 }}>
+                    {parts.map(([t, cls]) => (
+                      <span key={t} className={cls}>
+                        {t}
+                      </span>
+                    ))}
+                  </motion.span>
+                </span>
+              ))}
+            </span>
           </h1>
 
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.45 }}
-            className="mt-6 max-w-lg text-base leading-relaxed text-ink-soft sm:text-lg"
+            className="mt-4 max-w-xl text-base leading-relaxed text-ink-soft sm:text-[17px]"
           >
-            {site.tagline}. Verified properties across Kanpur and the best loan offers from 20+ banks — handled end-to-end
-            by one trusted team.
+            Verified homes, plots and shops, loans from 20+ banks, and legal checks till registry — one trusted team, start
+            to finish. No running between broker, bank and lawyer.
           </motion.p>
+
+          <motion.ul
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease, delay: 0.55 }}
+            className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink"
+          >
+            {["Legally verified listings", `Loans from ${s.rates.home}%`, "Paperwork till registry"].map((t) => (
+              <li key={t} className="flex items-center gap-1.5">
+                <CircleCheck className="size-4 text-accent" strokeWidth={2} />
+                {t}
+              </li>
+            ))}
+          </motion.ul>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.6 }}
           >
-            <SearchPanel localities={localities} />
+            <SearchPanel />
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.9 }}
-            className="mt-8 flex items-center gap-4"
+            className="mt-6 flex items-center gap-4"
           >
             <div className="flex -space-x-2.5">
               {[IMG.p1, IMG.p2, IMG.p3, IMG.p4].map((src) => (
@@ -92,7 +126,7 @@ export function Hero({ localities }: { localities: string[] }) {
                 ))}
                 <span className="ml-1">4.9</span>
               </p>
-              <p className="text-ink-soft">Trusted by 1,500+ Kanpur families</p>
+              <p className="text-ink-soft">Trusted by 1,500+ families across UP</p>
             </div>
           </motion.div>
         </div>
@@ -102,22 +136,23 @@ export function Hero({ localities }: { localities: string[] }) {
             initial={{ opacity: 0, scale: 0.94, clipPath: "inset(8% 8% 8% 8% round 32px)" }}
             animate={{ opacity: 1, scale: 1, clipPath: "inset(0% 0% 0% 0% round 32px)" }}
             transition={{ duration: 1.3, ease, delay: 0.15 }}
-            className="relative aspect-[4/5] overflow-hidden rounded-[32px] sm:aspect-[5/5] lg:aspect-[4/5]"
+            className="relative aspect-[4/5] overflow-hidden rounded-[32px] sm:aspect-[5/4] lg:aspect-auto lg:h-full lg:min-h-[480px]"
           >
             <motion.div style={{ y: imgY }} className="absolute -inset-y-[8%] inset-x-0">
               <Image
-                src={IMG.heroHouse}
-                alt="Modern family home at dusk"
+                src={heroFamily}
+                alt="A happy family receiving the keys to their new home from a Shri Banke Bihari advisor"
                 fill
                 preload
+                placeholder="blur"
                 quality={85}
                 sizes="(min-width: 1024px) 45vw, 100vw"
                 className="object-cover"
               />
             </motion.div>
-            <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
             <div className="absolute right-5 bottom-5 flex">
-              <p className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#111827] shadow-md">Garden Villa · ₹3.25 Cr</p>
+              <p className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#111827] shadow-md">🔑 Keys handed over</p>
             </div>
           </motion.div>
 
@@ -164,9 +199,10 @@ function FloatCard({ icon, label, value, delay }: { icon: React.ReactNode; label
   );
 }
 
-function SearchPanel({ localities }: { localities: string[] }) {
+function SearchPanel() {
   const s = useSite();
   const router = useRouter();
+  const { cities, city, setCity } = useCity();
   const [tab, setTab] = useState<(typeof tabs)[number]>("Buy");
   const [locality, setLocality] = useState("");
   const [type, setType] = useState("");
@@ -175,13 +211,15 @@ function SearchPanel({ localities }: { localities: string[] }) {
 
   const search = () => {
     const q = new URLSearchParams({ purpose: tab });
+    if (city) q.set("city", city);
     if (locality) q.set("locality", locality);
-    if (type) q.set("type", type);
+    if (type.startsWith("c:")) q.set("category", type.slice(2));
+    else if (type) q.set("type", type);
     router.push(`/properties?${q}`);
   };
 
   return (
-    <div className="mt-8 max-w-xl rounded-[26px] border border-line bg-surface p-2 shadow-soft">
+    <div className="mt-5 max-w-xl rounded-[26px] border border-line bg-surface p-2 shadow-soft">
       <div className="flex gap-1 p-1">
         {tabs.map((t) => (
           <button
@@ -209,10 +247,27 @@ function SearchPanel({ localities }: { localities: string[] }) {
           >
             <label className="flex items-center gap-2 rounded-2xl bg-subtle px-4 py-3">
               <MapPin className="size-4 shrink-0 text-accent" strokeWidth={1.5} />
-              <select value={locality} onChange={(e) => setLocality(e.target.value)} aria-label="Locality" className="w-full appearance-none bg-transparent text-sm text-ink focus:outline-none">
-                <option value="">All of Kanpur</option>
-                {localities.map((l) => (
-                  <option key={l}>{l}</option>
+              {/* One dropdown for both: "All of Lucknow" picks the city, a locality under it narrows further. */}
+              <select
+                value={locality ? `${city}|${locality}` : city}
+                onChange={(e) => {
+                  const [c, l = ""] = e.target.value.split("|");
+                  setCity(c);
+                  setLocality(l);
+                }}
+                aria-label="City or locality"
+                className="w-full min-w-0 appearance-none truncate bg-transparent text-sm text-ink focus:outline-none"
+              >
+                {cities.length > 1 && <option value="">All cities</option>}
+                {cities.map((c) => (
+                  <optgroup key={c.name} label={c.name}>
+                    <option value={c.name}>All of {c.name}</option>
+                    {c.localities.map((l) => (
+                      <option key={l} value={`${c.name}|${l}`}>
+                        {l}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </label>
@@ -220,8 +275,13 @@ function SearchPanel({ localities }: { localities: string[] }) {
               <House className="size-4 shrink-0 text-accent" strokeWidth={1.5} />
               <select value={type} onChange={(e) => setType(e.target.value)} aria-label="Property type" className="w-full appearance-none bg-transparent text-sm text-ink focus:outline-none">
                 <option value="">Any type</option>
-                {["Apartment", "Villa", "House", "Plot", "Commercial"].map((t) => (
-                  <option key={t}>{t}</option>
+                {CATEGORIES.map(({ value: c }) => (
+                  <optgroup key={c} label={c}>
+                    <option value={`c:${c}`}>Any {c.toLowerCase()}</option>
+                    {PROPERTY_TYPES[c].map((t) => (
+                      <option key={t}>{t}</option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </label>

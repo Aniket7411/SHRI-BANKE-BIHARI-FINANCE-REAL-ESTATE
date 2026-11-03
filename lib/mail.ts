@@ -9,7 +9,11 @@ import { site, type SiteSettings } from "@/lib/site";
  */
 let transporter: Transporter | null = null;
 
-export const isMailConfigured = () => Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+// Gmail account + App Password. SMTP_* names, or the shorter ADMIN_EMAIL / APP_PASSWORD (ADMINE_EMAIL also accepted).
+const smtpUser = () => process.env.SMTP_USER ?? process.env.ADMIN_EMAIL ?? process.env.ADMINE_EMAIL;
+const smtpPass = () => (process.env.SMTP_PASS ?? process.env.APP_PASSWORD)?.replace(/\s/g, "");
+
+export const isMailConfigured = () => Boolean(smtpUser() && smtpPass());
 
 function getTransporter() {
   if (!transporter) {
@@ -18,14 +22,14 @@ function getTransporter() {
       host: process.env.SMTP_HOST ?? "smtp.gmail.com",
       port,
       secure: port === 465,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      auth: { user: smtpUser(), pass: smtpPass() },
     });
   }
   return transporter;
 }
 
 export const notifyRecipients = () =>
-  (process.env.LEAD_NOTIFY_TO ?? process.env.SMTP_USER ?? "")
+  (process.env.LEAD_NOTIFY_TO ?? smtpUser() ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
@@ -37,7 +41,7 @@ export async function sendMail(opts: { to: string | string[]; subject: string; h
   }
   try {
     await getTransporter().sendMail({
-      from: `"${process.env.MAIL_FROM_NAME ?? site.name}" <${process.env.SMTP_USER}>`,
+      from: `"${process.env.MAIL_FROM_NAME ?? site.name}" <${smtpUser()}>`,
       ...opts,
     });
     return true;

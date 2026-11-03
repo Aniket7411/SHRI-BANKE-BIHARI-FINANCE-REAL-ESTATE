@@ -10,6 +10,7 @@ const url = z.union([z.url("Enter a full link starting with https://"), z.litera
 
 const schema = z.object({
   phone: z.string().min(8, "Enter the phone number"),
+  phone2: z.union([z.string().min(8, "Enter a full phone number"), z.literal("")]),
   whatsapp: z.string().regex(/^\d{10,15}$/, "Digits only, with country code, e.g. 919876543210"),
   email: z.email("Enter a valid email"),
   address: z.string().min(5, "Enter the address"),
@@ -37,6 +38,7 @@ export async function saveSettings(fd: FormData): Promise<ActionResult> {
 
   const parsed = schema.safeParse({
     phone: text(fd, "phone"),
+    phone2: text(fd, "phone2"),
     whatsapp: text(fd, "whatsapp").replace(/\D/g, ""),
     email: text(fd, "email"),
     address: text(fd, "address"),
@@ -49,7 +51,9 @@ export async function saveSettings(fd: FormData): Promise<ActionResult> {
   });
   if (!parsed.success) return fail("Please fix the highlighted fields", fieldErrors(parsed.error));
 
-  const { error } = await db.from("site_settings").upsert({ id: 1, data: parsed.data });
+  // Merge so keys managed elsewhere (siteMode, announcement, …) survive a save.
+  const { data: current } = await db.from("site_settings").select("data").eq("id", 1).maybeSingle();
+  const { error } = await db.from("site_settings").upsert({ id: 1, data: { ...((current?.data as object | null) ?? {}), ...parsed.data } });
   if (error) return fail(error.message);
   updateTag(TAGS.settings);
   return ok("Settings saved. The website is updated.");

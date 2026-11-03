@@ -4,7 +4,8 @@ import { ArrowUpRight, Check, Clock, FileCheck2, Handshake, Landmark, Phone, Shi
 import { IMG } from "@/lib/img";
 import { telLink, whatsappLink } from "@/lib/site";
 import { marquee, services, steps } from "@/lib/data/content";
-import { getSiteSettings } from "@/lib/api";
+import { getCities, getSiteSettings } from "@/lib/api";
+import { cityList } from "@/lib/cities";
 import { Counter } from "@/components/ui/Counter";
 import { Reveal, RevealItem, Stagger } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -31,8 +32,9 @@ export function Marquee() {
 /* ───────── Stats ───────── */
 export async function Stats() {
   const { stats } = await getSiteSettings();
+  if (!stats.length) return null;
   return (
-    <section className="container-app py-16 sm:py-20">
+    <section className="container-app py-12 sm:py-14">
       <Stagger className="grid grid-cols-2 gap-px overflow-hidden rounded-[28px] border border-line bg-line lg:grid-cols-4">
         {stats.map((s) => (
           <RevealItem key={s.label} className="bg-surface p-6 sm:p-8">
@@ -48,9 +50,10 @@ export async function Stats() {
 }
 
 /* ───────── Services ───────── */
-export function Services() {
+export async function Services() {
+  const cities = cityList((await getCities()).map((c) => c.name)) || "Kanpur";
   return (
-    <section className="container-app py-16 sm:py-24">
+    <section className="container-app py-10 sm:py-12">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <SectionHeading
           eyebrow="What we do"
@@ -74,7 +77,7 @@ export function Services() {
           img={IMG.keys}
           icon={<Building2 className="size-5" strokeWidth={1.5} />}
           title="Real Estate"
-          text="Buy, sell or rent — verified listings and honest valuations across Kanpur."
+          text={`Buy, sell or rent — verified listings and honest valuations across ${cities}.`}
           items={services.realEstate}
         />
         <ServiceCard
@@ -142,7 +145,7 @@ function ServiceCard({
 /* ───────── Process ───────── */
 export function Process() {
   return (
-    <section className="bg-subtle py-20 sm:py-28">
+    <section className="bg-subtle py-14 sm:py-16">
       <div className="container-app">
         <SectionHeading align="center" eyebrow="How it works" title="Four steps to your keys." />
         <Stagger className="relative mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4" gap={0.12}>
@@ -172,7 +175,7 @@ const reasons = [
 
 export function WhyUs() {
   return (
-    <section className="container-app grid items-center gap-14 py-20 sm:py-28 lg:grid-cols-2">
+    <section className="container-app grid items-center gap-10 py-14 sm:py-16 lg:grid-cols-2">
       <Reveal className="relative">
         <div className="grid grid-cols-5 grid-rows-6 gap-3 sm:gap-4">
           <div className="relative col-span-3 row-span-6 aspect-[3/4] overflow-hidden rounded-[26px]">
@@ -226,7 +229,7 @@ export async function InstagramStrip() {
   const s = await getSiteSettings();
   const shots = [IMG.house2, IMG.interior4, IMG.keys, IMG.villa, IMG.livingRoom, IMG.car2];
   return (
-    <section className="container-app py-20 sm:py-24">
+    <section className="container-app py-14 sm:py-16">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <SectionHeading eyebrow="Follow along" title={<>Fresh listings daily on Instagram.</>} text={`Join 1,500+ followers at ${s.instagramHandle} for new properties, rate updates and tips.`} />
         <Reveal>
@@ -261,8 +264,8 @@ export async function InstagramStrip() {
 export async function CtaBand() {
   const s = await getSiteSettings();
   return (
-    <section className="container-app pb-20 sm:pb-28">
-      <Reveal className="relative overflow-hidden rounded-[32px] bg-deep px-6 py-14 text-deep-fg sm:px-12 sm:py-20">
+    <section className="container-app pb-14 sm:pb-16">
+      <Reveal className="relative overflow-hidden rounded-[32px] bg-deep px-6 py-12 text-deep-fg sm:px-12 sm:py-14">
         <Image src={IMG.house6} alt="" fill sizes="100vw" className="object-cover opacity-25" />
         <div className="absolute inset-0 bg-gradient-to-r from-deep via-deep/85 to-deep/40" />
         <div className="relative max-w-2xl">

@@ -9,7 +9,8 @@ import { JobBoard } from "@/components/careers/JobBoard";
 
 export const metadata: Metadata = {
   title: "Careers",
-  description: `Join ${site.fullName} in Kanpur. Open roles in property sales, loans and operations.`,
+  description: `Join ${site.fullName}. Open roles in property sales, home loans and operations in Kanpur & Lucknow.`,
+  alternates: { canonical: "/careers" },
 };
 
 export default async function CareersPage() {
@@ -28,7 +29,7 @@ export default async function CareersPage() {
         text="We're a growing team helping families buy homes and get the right loans. Good incentives, real training and room to grow."
         image={IMG.team}
       />
-      <section className="container-app py-16 sm:py-24">
+      <section className="container-app py-10 sm:py-12">
         <SectionHeading
           eyebrow={jobs.length ? `${jobs.length} open ${jobs.length === 1 ? "role" : "roles"}` : "Openings"}
           title="Current openings"

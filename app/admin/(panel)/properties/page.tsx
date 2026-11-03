@@ -4,6 +4,7 @@ import { Copy, ExternalLink, Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { requireAdmin } from "@/lib/admin/auth";
 import { LISTING_STATUSES, listingStatus, timeAgo } from "@/lib/admin/meta";
 import { formatPrice } from "@/lib/format";
+import { DEFAULT_CITIES } from "@/lib/cities";
 import { ActionButton } from "@/components/admin/forms";
 import { Badge, ButtonLink, Empty, PageHeader, Table, button, td } from "@/components/admin/ui";
 import { deleteProperty, duplicateProperty, setPropertyFlag } from "./actions";
@@ -15,11 +16,14 @@ export default async function PropertiesAdminPage({ searchParams }: PageProps<"/
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const status = typeof sp.status === "string" ? sp.status : "";
+  const city = typeof sp.city === "string" ? sp.city : "";
 
-  let query = db.from("properties").select("id, title, type, purpose, locality, price, images, status, featured, updated_at").order("sort_order").order("created_at", { ascending: false });
+  let query = db.from("properties").select("id, title, type, purpose, city, locality, price, images, status, featured, updated_at").order("sort_order").order("created_at", { ascending: false });
   if (status) query = query.eq("status", status);
+  if (city) query = query.eq("city", city);
   if (q) query = query.or(`title.ilike.%${q.replace(/[%,()]/g, "")}%,locality.ilike.%${q.replace(/[%,()]/g, "")}%`);
-  const { data: rows, error } = await query;
+  const [{ data: rows, error }, { data: cityRows }] = await Promise.all([query, db.from("cities").select("name").order("sort_order").order("name")]);
+  const cities = cityRows?.length ? cityRows.map((c) => c.name as string) : DEFAULT_CITIES.map((c) => c.name);
 
   return (
     <>
@@ -43,8 +47,14 @@ export default async function PropertiesAdminPage({ searchParams }: PageProps<"/
             </option>
           ))}
         </select>
+        <select name="city" defaultValue={city} className="field-sm sm:w-40">
+          <option value="">All cities</option>
+          {cities.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </select>
         <button className={button("outline")}>Filter</button>
-        {(q || status) && (
+        {(q || status || city) && (
           <Link href="/admin/properties" className={button("ghost", "h-9")}>
             Clear
           </Link>
@@ -54,7 +64,7 @@ export default async function PropertiesAdminPage({ searchParams }: PageProps<"/
       {error && <p className="mb-4 text-sm text-red-600">{error.message}</p>}
 
       {!rows?.length ? (
-        <Empty title={q || status ? "No matching properties" : "No properties yet"} action={<ButtonLink href="/admin/properties/new">Add your first property</ButtonLink>} />
+        <Empty title={q || status || city ? "No matching properties" : "No properties yet"} action={<ButtonLink href="/admin/properties/new">Add your first property</ButtonLink>} />
       ) : (
         <Table head={["Property", "Price", "Status", "Featured", "Updated", ""]}>
           {rows.map((p) => {
@@ -72,7 +82,7 @@ export default async function PropertiesAdminPage({ searchParams }: PageProps<"/
                     <span className="min-w-0">
                       <span className="block truncate font-medium text-ink">{p.title}</span>
                       <span className="block truncate text-xs text-ink-soft">
-                        {p.type} · {p.purpose === "Buy" ? "Sale" : "Rent"} · {p.locality}
+                        {p.type} · {p.purpose === "Buy" ? "Sale" : "Rent"} · {p.locality}, {p.city ?? "Kanpur"}
                       </span>
                     </span>
                   </Link>

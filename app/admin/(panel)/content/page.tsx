@@ -1,26 +1,50 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowDown, ArrowUp, Plus, Star, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, BadgeCheck, Check, Plus, Star, Trash2 } from "lucide-react";
 import { requireAdmin } from "@/lib/admin/auth";
 import { ActionButton, ActionForm, Field, SubmitButton, Toggle } from "@/components/admin/forms";
 import { ImagePicker } from "@/components/admin/MediaManager";
 import { Badge, PageHeader } from "@/components/admin/ui";
-import { deleteContent, moveContent, saveContent } from "./actions";
+import { approveReview, deleteContent, moveContent, saveContent } from "./actions";
 
 export const metadata: Metadata = { title: "Reviews & FAQs" };
 
-type Testimonial = { id: number; name: string; role: string; quote: string; avatar: string; rating: number; active: boolean };
+type Testimonial = {
+  id: number;
+  name: string;
+  role: string;
+  quote: string;
+  avatar: string;
+  rating: number;
+  reel_url?: string | null;
+  active: boolean;
+  source?: "admin" | "customer";
+  verified_buyer?: boolean;
+  consent?: boolean;
+  created_at?: string;
+};
+const isPending = (r: Testimonial) => r.source === "customer" && !r.active;
 type Faq = { id: number; q: string; a: string; active: boolean };
 
 export default async function ContentPage({ searchParams }: PageProps<"/admin/content">) {
   const { db } = await requireAdmin();
   const tab = (await searchParams).tab === "faqs" ? "faqs" : "testimonials";
   const { data } = await db.from(tab).select("*").order("sort_order").order("id");
-  const rows = data ?? [];
+  // Customer reviews waiting for approval go on top.
+  const rows = tab === "testimonials" ? [...(data ?? [])].sort((a, b) => Number(isPending(b as Testimonial)) - Number(isPending(a as Testimonial))) : (data ?? []);
+  const pending = tab === "testimonials" ? rows.filter((r) => isPending(r as Testimonial)).length : 0;
 
   return (
     <>
-      <PageHeader title="Reviews & FAQs" text="Customer reviews appear on the homepage; FAQs on the Loans and Contact pages." />
+      <PageHeader
+        title="Reviews & FAQs"
+        text="Customer reviews appear on the homepage; FAQs on the Loans and Contact pages. To collect a review, mark a lead as Won and use “Ask for a review” on the lead."
+      />
+      {pending > 0 && (
+        <p className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          {pending} new customer review{pending > 1 ? "s" : ""} waiting for your approval.
+        </p>
+      )}
       <div className="mb-5 inline-flex rounded-full border border-line bg-surface p-1 text-sm">
         {[
           ["testimonials", "Customer reviews"],
@@ -46,7 +70,17 @@ export default async function ContentPage({ searchParams }: PageProps<"/admin/co
                           <Star key={k} className="size-3 fill-current" />
                         ))}
                       </span>
-                      {!r.active && <Badge>Hidden</Badge>}
+                      {(r as Testimonial).reel_url && <Badge tone="accent">Video</Badge>}
+                      {(r as Testimonial).verified_buyer && (
+                        <Badge tone="green">
+                          <BadgeCheck className="mr-0.5 inline size-3" /> Verified buyer
+                        </Badge>
+                      )}
+                      {isPending(r as Testimonial) ? (
+                        (r as Testimonial).consent === false ? <Badge tone="red">Private feedback</Badge> : <Badge tone="amber">Pending approval</Badge>
+                      ) : (
+                        !r.active && <Badge>Hidden</Badge>
+                      )}
                     </p>
                     <p className="truncate text-sm text-ink-soft">“{(r as Testimonial).quote}”</p>
                   </>
@@ -57,7 +91,13 @@ export default async function ContentPage({ searchParams }: PageProps<"/admin/co
                   </p>
                 )}
               </div>
-              <span className="text-xs text-ink-soft group-open:hidden">Edit</span>
+              {tab === "testimonials" && isPending(r as Testimonial) && (r as Testimonial).consent !== false ? (
+                <ActionButton action={approveReview} fields={{ id: String(r.id) }} variant="primary">
+                  <Check className="size-4" /> Approve
+                </ActionButton>
+              ) : (
+                <span className="text-xs text-ink-soft group-open:hidden">Edit</span>
+              )}
             </summary>
             <div className="border-t border-line p-4">
               <ContentForm tab={tab} row={r} />
@@ -138,6 +178,9 @@ function TestimonialFields({ t }: { t?: Testimonial }) {
       </Field>
       <Field label="Photo (optional)">
         <ImagePicker name="avatar" folder="testimonials" defaultValue={t?.avatar} />
+      </Field>
+      <Field label="Video review (optional)" name="reel_url" className="sm:col-span-2" hint="Paste Instagram reel or YouTube link. It's embedded under the reviews on the homepage. Needs migration 0003_cms.sql.">
+        <input name="reel_url" type="url" inputMode="url" defaultValue={t?.reel_url ?? ""} placeholder="https://www.instagram.com/reel/…" className="field-sm" />
       </Field>
     </>
   );

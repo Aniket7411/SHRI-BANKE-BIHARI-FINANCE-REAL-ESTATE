@@ -4,12 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
+  BadgePercent,
+  BellRing,
   Briefcase,
+  Banknote,
+  Percent,
   Building2,
+  Clapperboard,
+  CalendarClock,
+  Contact,
+  FileBadge,
   ExternalLink,
   LayoutDashboard,
   Landmark,
   LogOut,
+  MapPin,
   Menu,
   MessageSquareQuote,
   Settings,
@@ -19,6 +28,7 @@ import {
 } from "lucide-react";
 import { LogoMark } from "@/components/ui/BrandIcons";
 import { signOut } from "@/lib/admin/session-actions";
+import { DemoBadge } from "./DemoBadge";
 import type { Staff } from "@/lib/admin/auth";
 
 type Item = { href: string; label: string; icon: typeof LayoutDashboard; admin?: boolean };
@@ -26,11 +36,25 @@ type Item = { href: string; label: string; icon: typeof LayoutDashboard; admin?:
 const nav: { title?: string; items: Item[] }[] = [
   { items: [{ href: "/admin", label: "Dashboard", icon: LayoutDashboard }] },
   {
+    title: "Sales",
+    items: [
+      { href: "/admin/leads", label: "Leads", icon: Contact },
+      { href: "/admin/follow-ups", label: "Follow-ups", icon: CalendarClock },
+      { href: "/admin/requirements", label: "Requirements", icon: BellRing },
+    ],
+  },
+  {
     title: "Website",
     items: [
       { href: "/admin/properties", label: "Properties", icon: Building2, admin: true },
-      { href: "/admin/loans", label: "Loans & rates", icon: Landmark, admin: true },
+      { href: "/admin/cities", label: "Cities", icon: MapPin, admin: true },
+      { href: "/admin/rates", label: "Bank rates", icon: Percent, admin: true },
+      { href: "/admin/banks", label: "Banks", icon: Landmark, admin: true },
+      { href: "/admin/loans", label: "Loan products", icon: Banknote, admin: true },
+      { href: "/admin/reels", label: "Reels", icon: Clapperboard, admin: true },
+      { href: "/admin/offers", label: "Offers & coupons", icon: BadgePercent, admin: true },
       { href: "/admin/content", label: "Reviews & FAQs", icon: MessageSquareQuote, admin: true },
+      { href: "/admin/documents", label: "Documents", icon: FileBadge, admin: true },
       { href: "/admin/careers", label: "Careers", icon: Briefcase, admin: true },
     ],
   },
@@ -54,7 +78,7 @@ export function AdminShell({ staff, children }: { staff: Staff; children: React.
   const sidebar = (
     <div className="flex h-full flex-col">
       <Link href="/admin" className="flex items-center gap-2.5 px-5 py-5" onClick={() => setOpen(false)}>
-        <LogoMark className="size-9" />
+        <LogoMark className="size-11" />
         <span>
           <span className="block font-display text-[15px] leading-tight text-ink">Shri Banke Bihari</span>
           <span className="block text-[10px] tracking-[0.18em] text-ink-soft uppercase">Admin &amp; CRM</span>
@@ -85,6 +109,7 @@ export function AdminShell({ staff, children }: { staff: Staff; children: React.
         ))}
       </nav>
       <div className="border-t border-line p-3">
+        <DemoBadge />
         <a href="/" target="_blank" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-ink-soft hover:bg-subtle hover:text-ink">
           <ExternalLink className="size-4" strokeWidth={1.75} /> View website
         </a>
@@ -122,6 +147,7 @@ export function AdminShell({ staff, children }: { staff: Staff; children: React.
             <Menu className="size-4" />
           </button>
           <span className="font-display text-ink">Admin</span>
+          <DemoBadge compact />
         </header>
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
       </div>

@@ -53,7 +53,7 @@ export function WhatsAppWidget() {
           >
             <div className="flex items-center gap-3 bg-[#075e54] p-4 text-white">
               <div className="relative">
-                <LogoMark className="size-10" />
+                <LogoMark className="size-12" />
                 <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full border-2 border-[#075e54] bg-wa" />
               </div>
               <div className="flex-1">
